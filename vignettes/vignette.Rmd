@@ -7,6 +7,7 @@ vignette: >
   %\VignetteIndexEntry{Automultinomial Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
+  \usepackage{bm}
 ---
 
 ```{r setup, include=FALSE}
@@ -26,7 +27,7 @@ The organization of this document is:
 
 Consider a data problem where covariates (the independent variables) and categorical outcomes (the dependent variables) are observed on a spatial grid or lattice. If the outcomes are spatially autocorrelated, then our coefficient estimates and inference procedures ought to take this into account. Intuitively, when outcomes are correlated, the effective sample size of the dataset is smaller than if the outcomes were independent. The statistical information we can gain based on samples from multiple nearby sites may be less than if we were able to sample sites that are ``more independent". 
 
-A particular practical risk in neglecting spatial correlation is a confidence interval that is too narrow. We might find ``statistically significant" relationships that are in fact byproducts of noise or dependent sampling. The automultinomial package provides a tool for dealing with outcomes with spatial autocorrelation. It may happen that even nearby sites in a dataset are still effectively independent. But we can only assess this using a method that accounts for the spatial arrangement of the samples. 
+A particular practical risk in neglecting spatial correlation is that confidence intervals may be too narrow. We might find ``statistically significant" relationships that are in fact byproducts of noise or dependent sampling. The automultinomial package provides a tool for dealing with outcomes with spatial autocorrelation. It may happen that even nearby sites in a dataset are still effectively independent. But we can only assess this using a method that accounts for the spatial arrangement of the samples. 
 
 Having given a qualitative description of the data problem, we will now move on to a discussion of the probability model used by automultinomial.
 
@@ -41,7 +42,7 @@ To describe the setup in automultinomial, we will use the notations
 * $z_i=1,...,K$ to denote the response at site $i$
   + $\mathbf{z}$ to denote the vector of categorical responses for all the sites
   + $z_{-i}$ to denote the entire response vector $\mathbf{z}$, *except* for site $i$
-* $\mathbf{\beta}\in\mathbb{R}^{p\times (K-1)}$ to denote the coefficient matrix (when $K=2$, $\beta$ is a vector of length $p$, as in logistic regression)
+* $\bm{\beta}\in\mathbb{R}^{p\times (K-1)}$ to denote the coefficient matrix (when $K=2$, $\beta$ is a vector of length $p$, as in logistic regression)
   + $\beta_k$ to denote the $k$-th column of $\beta$.
 * $\gamma$ to denote the autocorrelation parameter
 
@@ -49,12 +50,12 @@ We will assume that for each site $i$, a collection $N_i$ of neighboring sites i
 
 In the automultinomial package, we will require that the neighborhoods are *symmetric*: if $i'\in N_i$, then necessarily $i\in N_{i'}$ as well. 
 
-We will also define an *energy* function $H(\mathbf{z}|\mathbf{\beta},\gamma)$. When $K=2$ and the two categories are $k=1$ and $k=2$, then
-$\mathbf{\beta}$ is just a vector with length $p$, and \begin{eqnarray}
+We will also define an *energy* function $H(\mathbf{z}|\bm{\beta},\gamma)$. When $K=2$ and the two categories are $k=1$ and $k=2$, then
+$\bm{\beta}$ is just a vector with length $p$, and \begin{eqnarray}
 H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)
 \end{eqnarray}
 
-In general, for $K\geq 2$ we define $H(\mathbf{z}|\mathbf{\beta},\gamma)$ by
+In general, for $K\geq 2$ we define $H(\mathbf{z}|\bm{\beta},\gamma)$ by
 
 \begin{eqnarray}
 H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}\sum_{k=1}^{K-1}x_i^T\beta_kI(z_i=k+1)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{K}I(z_i=z_{i'}=k)
@@ -63,42 +64,42 @@ H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}\sum_{k=1}^{K-1}x_i^T\beta_kI(z_i=k+1)+
 With this preamble accomplished, we can define the probability model automultinomial seeks to estimate:
 
 \begin{eqnarray}
-p(\mathbf{z}|\mathbf{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\mathbf{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\mathbf{\beta},\gamma)\}}\label{density}
+p(\mathbf{z}|\bm{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\bm{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\bm{\beta},\gamma)\}}\label{density}
 \end{eqnarray}
 
 The term $\sum_{\mathbf{z'}}$ indicates a sum over all possible categorical responses for the entire dataset.
 
 Some intuition regarding \eqref{density} can be gained as follows: when $\gamma=0$, then $\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)=0$ so that the $z_i$ are completely independent. In this case the autologistic (automultinomial) model is the same as an ordinary logistic (multinomial logit) model. On the other hand, when $\gamma>0$, then response configurations $\mathbf{z}$ where $z_i=z_{i'}$ for many neighbor pairs $i\sim i'$ becomes more likely. In this way, $\gamma$ incorporates positive spatial correlation into the responses. When $\gamma<0$, we expect neighboring $z_i,z_{i'}$ to *disagree* more frequently than if the $z_i$ were independent, and the $\gamma<0$ case will in practice be less common.
 
-###Estimating $\mathbf{\beta}$ and $\gamma$
+###Estimating $\bm{\beta}$ and $\gamma$
 
 The automultinomial package follows the pseudolikelihood approach of (Besag, 1974) to estimate the parameters $\beta,\gamma$. We briefly explain the procedure and its motivation below.
 
-When $\gamma$ is known to be $0$, then the responses $z_i$ are independent, and we can use common maximum likelihood techniques such as logistic or multinomial regression to estimate $\beta$. On the other hand, when spatial correlation is present and we use the automultinomial framework to account for it, then we need to estimate $\mathbf{\beta}$ and $\gamma$ jointly. Unfortunately, maximum likelihood is computationally infeasible due the well known computational intractability of the denominator of $\eqref{density}$ when $\gamma\neq 0$.
+When $\gamma$ is known to be $0$, then the responses $z_i$ are independent, and we can use common maximum likelihood techniques such as logistic or multinomial regression to estimate $\beta$. On the other hand, when spatial correlation is present and we use the automultinomial framework to account for it, then we need to estimate $\bm{\beta}$ and $\gamma$ jointly. Unfortunately, maximum likelihood is computationally infeasible due the well known computational intractability of the denominator of $\eqref{density}$ when $\gamma\neq 0$.
 
 Fortunately, a proposal of (Besag, 1974) provides a consistent estimation procedure, maximum pseudolikelihood, for the parameters of the model in equation \eqref{density}. In maximum pseudolikelihood, we maximize
 
 \begin{eqnarray}
-\ell_{PL}=\sum_{i=1}^{n}\log\{p(z_i|z_{-i},\mathbf{\beta},\gamma)\}\label{pseudolikelihood}
+\ell_{PL}=\sum_{i=1}^{n}\log\{p(z_i|z_{-i},\bm{\beta},\gamma)\}\label{pseudolikelihood}
 \end{eqnarray}
 
-over $\beta$ and $\gamma$. The expression $p(z_i|z_{-i},\mathbf{\beta},\gamma)$ refers to the conditional density of $z_i$ given the sites at all of the other grid locations. A short calculation based on \eqref{density} shows that for $K=2$
+over $\beta$ and $\gamma$. The expression $p(z_i|z_{-i},\bm{\beta},\gamma)$ refers to the conditional density of $z_i$ given the sites at all of the other grid locations. A short calculation based on \eqref{density} shows that for $K=2$
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\mathbf{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
-p(z_i=2|z_{-i},\mathbf{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
+p(z_i=1|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
+p(z_i=2|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
 \end{eqnarray}
 
 For $K\geq 2$ response categories, we have 
 
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\mathbf{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
+p(z_i=1|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
 \end{eqnarray}
 
 and for $k>1$,
 \begin{eqnarray}
-p(z_i=k|z_{-i},\mathbf{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
+p(z_i=k|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
 \end{eqnarray}
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} and plugged into \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\beta$ and $\gamma$ using the function optim.
@@ -107,15 +108,18 @@ In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, an
 
 Installing from Github is (I think) as easy as installing from cran. First, make sure Hadley Wickham's package devtools is installed on your RStudio:
 
-```{r}
+```{r,eval=FALSE}
 install.packages("devtools")
 ```
 
 Then, run the following:
 
-```{r}
+```{r,eval=FALSE}
 devtools::install_github(repo="stephenberg/automultinomial2")
+library(automultinomial2)
 ```
+
+And that's it.
 
 #Data example 1: K=2 response categories
 
@@ -182,38 +186,38 @@ Now we'll fit an autologistic model using the MPLE function. Then, we will exami
 
 We can access information from the fitted model object, but we can also use the MPLE_summary function to view the model summary in table form.
 ```{r}
-#responses must be input as a factor
-# y=factor(y)
-# fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-# fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
-# 
-# #to see the information contained in fit1 and fit2, use str() (not run to save space)
-# #str(fit1)
-# #str(fit2)
-# 
-# fitSummary1=MPLE_summary(fit1)
-# fitSummary2=MPLE_summary(fit2)
+# responses must be input as a factor
+y=factor(y)
+fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+
+#to see the information contained in fit1 and fit2, use str() (not run to save space)
+#str(fit1)
+#str(fit2)
+
+fitSummary1=MPLE_summary(fit1)
+fitSummary2=MPLE_summary(fit2)
 
 ```
 
 ```{r,echo=FALSE,warning=FALSE}
-# library(ggplot2)
-# ciMat1=fit1$ciMatrix
-# ciMat2=fit1$ciMatrix
-# df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
-# df=as.data.frame(df)
-# df=cbind(df,factor(c(as.character(1:5),"gamma")))
-# colnames(df)[5:7]=c("Truth","MPLE","coefficient")
-# cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
-# cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
-# p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
-# p1=p1+geom_point(show.legend=TRUE)
-# p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
-# p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
-# p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
-# p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
-# p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
-# p1
+library(ggplot2)
+ciMat1=fit1$ciMatrix
+ciMat2=fit1$ciMatrix
+df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
+df=as.data.frame(df)
+df=cbind(df,factor(c(as.character(1:5),"gamma")))
+colnames(df)[5:7]=c("Truth","MPLE","coefficient")
+cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
+cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
+p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
+p1=p1+geom_point(show.legend=TRUE)
+p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
+p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
+p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
+p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
+p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
+p1
 ```
 
 #Data example 2: K=3 response categories
@@ -261,7 +265,7 @@ Figure \ref{plotk3} shows plots of the 3-category responses on the grid. On the 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{plots/plotk2.png}
+	\includegraphics[width=1\textwidth]{plots/plotk3.png}
 	\caption{On the left, a plot of the 3-category dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
 	\label{fig:plotk3}
 \end{figure}
@@ -279,37 +283,37 @@ Figure \ref{plotk3} shows plots of the 3-category responses on the grid. On the 
 ###Fitting an automultinomial model to the data (K=3 categories)
 
 ```{r}
-# #responses must be input as a factor
-# y=factor(y)
-# fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-# fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
-# 
-# #to see the information contained in fit1 and fit2, use str() (not run to save space)
-# #str(fit1)
-# #str(fit2)
-# 
-# fitSummary1=MPLE_summary(fit1)
-# fitSummary2=MPLE_summary(fit2)
+#responses must be input as a factor
+y=factor(y)
+fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+
+#to see the information contained in fit1 and fit2, use str() (not run to save space)
+#str(fit1)
+#str(fit2)
+
+fitSummary1=MPLE_summary(fit1)
+fitSummary2=MPLE_summary(fit2)
 
 ```
 
 
 ```{r,echo=FALSE,warning=FALSE}
-# library(ggplot2)
-# ciMat1=fit1$ciMatrix
-# ciMat2=fit1$ciMatrix
-# df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
-# df=as.data.frame(df)
-# df=cbind(df,factor(rownames(ciMat1)))
-# colnames(df)[5:7]=c("Truth","MPLE","coefficient")
-# cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
-# cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
-# p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
-# p1=p1+geom_point(show.legend=TRUE)
-# p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
-# p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
-# p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
-# p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
-# p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
-# p1
+library(ggplot2)
+ciMat1=fit1$ciMatrix
+ciMat2=fit1$ciMatrix
+df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
+df=as.data.frame(df)
+df=cbind(df,factor(rownames(ciMat1)))
+colnames(df)[5:7]=c("Truth","MPLE","coefficient")
+cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
+cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
+p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
+p1=p1+geom_point(show.legend=TRUE)
+p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
+p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
+p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
+p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
+p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
+p1
 ```
