@@ -24,7 +24,7 @@ The organization of this document is:
 3. A data example with binary response (2 response categories)
 4. A data example with 3 response categories
 
-#1 The problem automultinomial solves
+\section{The problem automultinomial solves}
 
 Consider a data problem where covariates (the independent variables) and categorical outcomes (the dependent variables) are observed on a spatial grid or lattice. If the outcomes are spatially autocorrelated, then our coefficient estimates and inference procedures ought to take this into account. Intuitively, when outcomes are correlated, the effective sample size of the dataset is smaller than if the outcomes were independent. The statistical information we can gain based on samples from multiple nearby sites may be less than if we were able to sample sites that are ``more independent". 
 
@@ -105,7 +105,7 @@ p(z_i=k|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} and plugged into \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\beta$ and $\gamma$ using the function optim.
 
-#Installing from Github
+\section{Installing from Github}
 
 Installing from Github is (I think) as easy as installing from cran. First, make sure Hadley Wickham's package devtools is installed on your RStudio:
 
@@ -120,9 +120,9 @@ devtools::install_github(repo="stephenberg/automultinomial2")
 library(automultinomial2)
 ```
 
-And that's it.
+Now the package is ready to run.
 
-#Data example 1: K=2 response categories
+\section{Data example 1: K=2 response categories}
 
 Here, we will demonstrate how to simulate data using automultinomial, how to fit data using automultinomial, and how to analyze the output.
 
@@ -162,7 +162,7 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 # y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
-Figure \ref{plotk2} shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
 
 \begin{figure}
 	\centering
@@ -221,7 +221,7 @@ p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
 p1
 ```
 
-#Data example 2: K=3 response categories
+\section{Data example 2: K=3 response categories}
 
 Here, we demonstrate the use of the package when there are 3 response categories. Essentially, everything is still the same, and most of the code doesn't change at all. The only difference is that now, the $\boldsymbol{\beta}$ is a matrix with $2=K-1$ columns, rather than a vector as in the $K=2$ case.
 
@@ -262,7 +262,7 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 #y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
-Figure \ref{plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
 
 \begin{figure}
 	\centering
