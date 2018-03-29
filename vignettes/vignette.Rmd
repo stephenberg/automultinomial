@@ -13,18 +13,26 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This vignette explains the installation and use of the R package automultinomial. The automultinomial package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the auto-logistic (multinomial) model includes an autocorrelation parameter to account for spatial dependence between observations.
+This vignette explains the installation and use of the R package automultinomial. The automultinomial package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the autologistic/automultinomial model includes an autocorrelation parameter to account for spatial dependence between observations.
 
 The organization of this document is:
 
 1. Description of the problem automultinomial solves
-2. A data example with binary response (2 response categories)
-3. A data example with 3 response categories
-4. Technical appendix-a comparison of different parameterizations of the 2-category autologistic model
+2. Github installation how-to
+3. A data example with binary response (2 response categories)
+4. A data example with 3 response categories
 
 #1 The problem automultinomial solves
 
-Consider a data problem where covariates (the independent variables) and categorical responses (the dependent variables) are observed on a spatial grid or lattice. To describe the setup in automultinomial, we will frequently use the notations
+Consider a data problem where covariates (the independent variables) and categorical outcomes (the dependent variables) are observed on a spatial grid or lattice. If the outcomes are spatially autocorrelated, then our coefficient estimates and inference procedures ought to take this into account. Intuitively, when outcomes are correlated, the effective sample size of the dataset is smaller than if the outcomes were independent. The statistical information we can gain based on samples from multiple nearby sites may be less than if we were able to sample sites that are ``more independent". 
+
+A particular practical risk in neglecting spatial correlation is a confidence interval that is too narrow. We might find ``statistically significant" relationships that are in fact byproducts of noise or dependent sampling. The automultinomial package provides a tool for dealing with outcomes with spatial autocorrelation. It may happen that even nearby sites in a dataset are still effectively independent. But we can only assess this using a method that accounts for the spatial arrangement of the samples. 
+
+Having given a qualitative description of the data problem, we will now move on to a discussion of the probability model used by automultinomial.
+
+###Mathematical description
+
+To describe the setup in automultinomial, we will use the notations
 
 * $i=1,...,n$ to index the $n$ observation sites on the spatial grid
 * $K\geq 2$ to denote the number of possible values taken by the response
@@ -37,7 +45,7 @@ Consider a data problem where covariates (the independent variables) and categor
   + $\beta_k$ to denote the $k$-th column of $\beta$.
 * $\gamma$ to denote the autocorrelation parameter
 
-We will assume that for each site $i$, a collection $N_i$ of neighboring sites is known. If the data are collected in a square lattice fashion, then a natural neighborhood setup is to set $N_i$ to be the Up, Down, Left, and Right neighbors of site $i$ (sites at the boundary may have less than 4 neighbors). We will assume $i\notin N_{i}$ for each $i$, so that site $i$ is not a neighbor of itself. It is allowable for sites to have no neighbors. In this case $N_i=\phi$, where $\phi$ denotes the empty set. We will use the notation $i'\sim i$ to indicate that site $i'$ is a neighbor of site $i$.
+We will assume that for each site $i$, a collection $N_i$ of neighboring sites is known. If the data are collected in a square lattice fashion, then a natural neighborhood setup is to set $N_i$ to be the 4 Up, Down, Left, and Right neighbors of site $i$ (sites at the boundary may have less than 4 neighbors). We will assume $i\notin N_{i}$ for each $i$, so that site $i$ is not a neighbor of itself. It is allowable for sites to have no neighbors. In this case $N_i=\phi$, where $\phi$ denotes the empty set. We will use the notation $i'\sim i$ to indicate that site $i'$ is a neighbor of site $i$.
 
 In the automultinomial package, we will require that the neighborhoods are *symmetric*: if $i'\in N_i$, then necessarily $i\in N_{i'}$ as well. 
 
@@ -95,6 +103,20 @@ p(z_i=k|z_{-i},\mathbf{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamm
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} and plugged into \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\beta$ and $\gamma$ using the function optim.
 
+#Installing from Github
+
+Installing from Github is (I think) as easy as installing from cran. First, make sure Hadley Wickham's package devtools is installed on your RStudio:
+
+```{r}
+install.packages("devtools")
+```
+
+Then, run the following:
+
+```{r}
+devtools::install_github(repo="stephenberg/automultinomial2")
+```
+
 #Data example 1: K=2 response categories
 
 Here, we will demonstrate how to simulate data using automultinomial, how to fit data using automultinomial, and how to analyze the output.
@@ -132,17 +154,26 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
 ```{r,echo=FALSE}
-y2=drawSamples(beta,0,X,A,nSamples = 1)
+# y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
-Below is a plot of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+Figure \ref{plotk2} shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{plots/plotk2.png}
+	\caption{On the left, a plot of the dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
+	\label{fig:plotk2}
+\end{figure}
 
 
 ```{r,echo=FALSE,warning=FALSE}
-im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-library(gridExtra)
-grid.arrange(im1, im2, ncol = 2)
+# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+# library(gridExtra)
+# png(filename = "plots/plotk2.png",width = 500,height = 300)
+# grid.arrange(im1, im2, ncol = 2)
+# dev.off()
 ```
 
 ###Fitting an autologistic model to the data (K=2 categories)
@@ -152,17 +183,37 @@ Now we'll fit an autologistic model using the MPLE function. Then, we will exami
 We can access information from the fitted model object, but we can also use the MPLE_summary function to view the model summary in table form.
 ```{r}
 #responses must be input as a factor
-y=factor(y)
-fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+# y=factor(y)
+# fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+# fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+# 
+# #to see the information contained in fit1 and fit2, use str() (not run to save space)
+# #str(fit1)
+# #str(fit2)
+# 
+# fitSummary1=MPLE_summary(fit1)
+# fitSummary2=MPLE_summary(fit2)
 
-#to see the information contained in fit1 and fit2, use str() (not run to save space)
-#str(fit1)
-#str(fit2)
+```
 
-fitSummary1=MPLE_summary(fit1)
-fitSummary2=MPLE_summary(fit2)
-
+```{r,echo=FALSE,warning=FALSE}
+# library(ggplot2)
+# ciMat1=fit1$ciMatrix
+# ciMat2=fit1$ciMatrix
+# df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
+# df=as.data.frame(df)
+# df=cbind(df,factor(c(as.character(1:5),"gamma")))
+# colnames(df)[5:7]=c("Truth","MPLE","coefficient")
+# cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
+# cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
+# p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
+# p1=p1+geom_point(show.legend=TRUE)
+# p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
+# p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
+# p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
+# p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
+# p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
+# p1
 ```
 
 #Data example 2: K=3 response categories
@@ -203,54 +254,62 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
 ```{r,echo=FALSE}
-y2=drawSamples(beta,0,X,A,nSamples = 1)
+#y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
-Below is a plot of the responses on the grid. On the left plot, we again see clumping of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+Figure \ref{plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\beta$, and $\gamma=0$.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{plots/plotk2.png}
+	\caption{On the left, a plot of the 3-category dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
+	\label{fig:plotk3}
+\end{figure}
 
 
 ```{r,echo=FALSE,warning=FALSE}
-im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-library(gridExtra)
-grid.arrange(im1, im2, ncol = 2)
+# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+# library(gridExtra)
+# png(filename = "plots/plotk3.png",width=500,height=300)
+# grid.arrange(im1, im2, ncol = 2)
+# dev.off()
 ```
 
-###Fitting an autologistic model to the data (K=2 categories)
+###Fitting an automultinomial model to the data (K=3 categories)
 
-Now we'll fit an autologistic model using the MPLE function. Then, we will examine confidence intervals for the fitted parameters. By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator to confidence intervals based on the parametric bootstrap. The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals. To compute bootstrap confidence intervals, set method="boot". We will set the number of bootstrap samples using the nBoot argument.
-
-We can access information from the fitted model object, but we can also use the MPLE_summary function to view the model summary in table form.
 ```{r}
-#responses must be input as a factor
-y=factor(y)
-fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
-
-#to see the information contained in fit1 and fit2, use str() (not run to save space)
-#str(fit1)
-#str(fit2)
-
-fitSummary1=MPLE_summary(fit1)
-fitSummary2=MPLE_summary(fit2)
+# #responses must be input as a factor
+# y=factor(y)
+# fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+# fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+# 
+# #to see the information contained in fit1 and fit2, use str() (not run to save space)
+# #str(fit1)
+# #str(fit2)
+# 
+# fitSummary1=MPLE_summary(fit1)
+# fitSummary2=MPLE_summary(fit2)
 
 ```
 
-From the figure below, we see that our pseudolikelihood parameter estimates are close to the true coefficient values. Additionally, the bootstrap and asymptotic confidence intervals are extremely similar, so it would be reasonable, at least  for this example, to save computational time and use the asymptotic intervals.
 
-```{r}
-library(ggplot2)
-ciMat1=fit1$ciMatrix
-ciMat2=fit1$ciMatrix
-df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
-df=as.data.frame(df)
-df=cbind(df,factor(c(as.character(1:10),"gamma")))
-colnames(df)[5:7]=c("PMLE","Truth","coefficient")
-cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7")
-p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
-p1=p1+geom_point(data=df,aes(x=coefficient,y=PMLE),size=2,shape=21,fill="black")
-p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth),size=2, shape=21, fill="white")
-p1=p1+scale_y_continuous(limits=c(-0.4,0.8),name = "Coefficient Estimates")
-p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
-p1
+```{r,echo=FALSE,warning=FALSE}
+# library(ggplot2)
+# ciMat1=fit1$ciMatrix
+# ciMat2=fit1$ciMatrix
+# df=cbind(fit1$ciMatrix,fit2$ciMatrix,c(beta,gamma),c(fit1$betaHat,fit1$gammaHat))
+# df=as.data.frame(df)
+# df=cbind(df,factor(rownames(ciMat1)))
+# colnames(df)[5:7]=c("Truth","MPLE","coefficient")
+# cbPalette <- c("Asymptotic"="#009E73" ,"Bootstrap"="#CC79A7","MPLE"="#009E73" ,"Truth"="#CC79A7")
+# cbPalette2 <- c("MPLE"=21 ,"Truth"=23)
+# p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],color="Asymptotic"),size=1)+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,3],ymax=df[,4],color="Bootstrap"),size=1)
+# p1=p1+geom_point(show.legend=TRUE)
+# p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
+# p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
+# p1=p1+scale_y_continuous(limits=c(-0.5,0.9),name = "Coefficient Estimates")
+# p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
+# p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
+# p1
 ```
