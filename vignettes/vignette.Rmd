@@ -6,8 +6,9 @@ output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Automultinomial Vignette}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
-  \usepackage{bm}
+  header-includes:
+   - \usepackage{amsmath}
+   - \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}
@@ -42,20 +43,20 @@ To describe the setup in automultinomial, we will use the notations
 * $z_i=1,...,K$ to denote the response at site $i$
   + $\mathbf{z}$ to denote the vector of categorical responses for all the sites
   + $z_{-i}$ to denote the entire response vector $\mathbf{z}$, *except* for site $i$
-* $\bm{\beta}\in\mathbb{R}^{p\times (K-1)}$ to denote the coefficient matrix (when $K=2$, $\beta$ is a vector of length $p$, as in logistic regression)
-  + $\beta_k$ to denote the $k$-th column of $\beta$.
+* $\boldsymbol{\beta}\in\mathbb{R}^{p\times (K-1)}$ to denote the coefficient matrix (when $K=2$, $\boldsymbol{\beta}$ is a vector of length $p$, as in logistic regression)
+  + $\beta_k$ to denote the $k$-th column of $\boldsymbol{\beta}$.
 * $\gamma$ to denote the autocorrelation parameter
 
 We will assume that for each site $i$, a collection $N_i$ of neighboring sites is known. If the data are collected in a square lattice fashion, then a natural neighborhood setup is to set $N_i$ to be the 4 Up, Down, Left, and Right neighbors of site $i$ (sites at the boundary may have less than 4 neighbors). We will assume $i\notin N_{i}$ for each $i$, so that site $i$ is not a neighbor of itself. It is allowable for sites to have no neighbors. In this case $N_i=\phi$, where $\phi$ denotes the empty set. We will use the notation $i'\sim i$ to indicate that site $i'$ is a neighbor of site $i$.
 
 In the automultinomial package, we will require that the neighborhoods are *symmetric*: if $i'\in N_i$, then necessarily $i\in N_{i'}$ as well. 
 
-We will also define an *energy* function $H(\mathbf{z}|\bm{\beta},\gamma)$. When $K=2$ and the two categories are $k=1$ and $k=2$, then
-$\bm{\beta}$ is just a vector with length $p$, and \begin{eqnarray}
+We will also define an *energy* function $H(\mathbf{z}|\boldsymbol{\beta},\gamma)$. When $K=2$ and the two categories are $k=1$ and $k=2$, then
+$\boldsymbol{\beta}$ is just a vector with length $p$, and \begin{eqnarray}
 H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)
 \end{eqnarray}
 
-In general, for $K\geq 2$ we define $H(\mathbf{z}|\bm{\beta},\gamma)$ by
+In general, for $K\geq 2$ we define $H(\mathbf{z}|\boldsymbol{\beta},\gamma)$ by
 
 \begin{eqnarray}
 H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}\sum_{k=1}^{K-1}x_i^T\beta_kI(z_i=k+1)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{K}I(z_i=z_{i'}=k)
@@ -64,42 +65,42 @@ H(\mathbf{z}|\beta,\gamma)=\sum_{i=1}^{n}\sum_{k=1}^{K-1}x_i^T\beta_kI(z_i=k+1)+
 With this preamble accomplished, we can define the probability model automultinomial seeks to estimate:
 
 \begin{eqnarray}
-p(\mathbf{z}|\bm{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\bm{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\bm{\beta},\gamma)\}}\label{density}
+p(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\boldsymbol{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\boldsymbol{\beta},\gamma)\}}\label{density}
 \end{eqnarray}
 
 The term $\sum_{\mathbf{z'}}$ indicates a sum over all possible categorical responses for the entire dataset.
 
 Some intuition regarding \eqref{density} can be gained as follows: when $\gamma=0$, then $\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)=0$ so that the $z_i$ are completely independent. In this case the autologistic (automultinomial) model is the same as an ordinary logistic (multinomial logit) model. On the other hand, when $\gamma>0$, then response configurations $\mathbf{z}$ where $z_i=z_{i'}$ for many neighbor pairs $i\sim i'$ becomes more likely. In this way, $\gamma$ incorporates positive spatial correlation into the responses. When $\gamma<0$, we expect neighboring $z_i,z_{i'}$ to *disagree* more frequently than if the $z_i$ were independent, and the $\gamma<0$ case will in practice be less common.
 
-###Estimating $\bm{\beta}$ and $\gamma$
+###Estimating $\boldsymbol{\beta}$ and $\gamma$
 
 The automultinomial package follows the pseudolikelihood approach of (Besag, 1974) to estimate the parameters $\beta,\gamma$. We briefly explain the procedure and its motivation below.
 
-When $\gamma$ is known to be $0$, then the responses $z_i$ are independent, and we can use common maximum likelihood techniques such as logistic or multinomial regression to estimate $\beta$. On the other hand, when spatial correlation is present and we use the automultinomial framework to account for it, then we need to estimate $\bm{\beta}$ and $\gamma$ jointly. Unfortunately, maximum likelihood is computationally infeasible due the well known computational intractability of the denominator of $\eqref{density}$ when $\gamma\neq 0$.
+When $\gamma$ is known to be $0$, then the responses $z_i$ are independent, and we can use common maximum likelihood techniques such as logistic or multinomial regression to estimate $\beta$. On the other hand, when spatial correlation is present and we use the automultinomial framework to account for it, then we need to estimate $\boldsymbol{\beta}$ and $\gamma$ jointly. Unfortunately, maximum likelihood is computationally infeasible due the well known computational intractability of the denominator of $\eqref{density}$ when $\gamma\neq 0$.
 
 Fortunately, a proposal of (Besag, 1974) provides a consistent estimation procedure, maximum pseudolikelihood, for the parameters of the model in equation \eqref{density}. In maximum pseudolikelihood, we maximize
 
 \begin{eqnarray}
-\ell_{PL}=\sum_{i=1}^{n}\log\{p(z_i|z_{-i},\bm{\beta},\gamma)\}\label{pseudolikelihood}
+\ell_{PL}=\sum_{i=1}^{n}\log\{p(z_i|z_{-i},\boldsymbol{\beta},\gamma)\}\label{pseudolikelihood}
 \end{eqnarray}
 
-over $\beta$ and $\gamma$. The expression $p(z_i|z_{-i},\bm{\beta},\gamma)$ refers to the conditional density of $z_i$ given the sites at all of the other grid locations. A short calculation based on \eqref{density} shows that for $K=2$
+over $\beta$ and $\gamma$. The expression $p(z_i|z_{-i},\boldsymbol{\beta},\gamma)$ refers to the conditional density of $z_i$ given the sites at all of the other grid locations. A short calculation based on \eqref{density} shows that for $K=2$
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
-p(z_i=2|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
+p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
+p(z_i=2|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
 \end{eqnarray}
 
 For $K\geq 2$ response categories, we have 
 
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
+p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
 \end{eqnarray}
 
 and for $k>1$,
 \begin{eqnarray}
-p(z_i=k|z_{-i},\bm{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
+p(z_i=k|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_k^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
 \end{eqnarray}
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} and plugged into \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\beta$ and $\gamma$ using the function optim.
@@ -189,7 +190,7 @@ We can access information from the fitted model object, but we can also use the 
 # responses must be input as a factor
 y=factor(y)
 fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 1)
 
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
 #str(fit1)
@@ -222,7 +223,7 @@ p1
 
 #Data example 2: K=3 response categories
 
-Here, we demonstrate the use of the package when there are 3 response categories. Essentially, everything is still the same, and most of the code doesn't change at all. The only difference is that now, the $\beta$ is a matrix with $2=K-1$ columns, rather than a vector as in the $K=2$ case.
+Here, we demonstrate the use of the package when there are 3 response categories. Essentially, everything is still the same, and most of the code doesn't change at all. The only difference is that now, the $\boldsymbol{\beta}$ is a matrix with $2=K-1$ columns, rather than a vector as in the $K=2$ case.
 
 ###Simulating data
 
@@ -286,7 +287,7 @@ Figure \ref{plotk3} shows plots of the 3-category responses on the grid. On the 
 #responses must be input as a factor
 y=factor(y)
 fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 1)
 
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
 #str(fit1)
