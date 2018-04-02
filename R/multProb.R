@@ -1,4 +1,4 @@
-MPLE<-function(X,y,A,ciLevel=0.95,method="boot",burnIn=300,nBoot=500){
+MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
   if (method!="boot"){
     if (method!="asymptotic"){
@@ -135,7 +135,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="boot",burnIn=300,nBoot=500){
     ciMatrix[,2]=betaGamma+ciQuantile*sqrt(diag(variance))
     colnames(ciMatrix)=c("lower","upper")
     rownames(ciMatrix)=varianceNames
-    return(list(betaHat=betaHat,gammaHat=gammaHat,zScores=zScores,pValues=pValues,ciMatrix=ciMatrix,variance=variance))
+    return(list(betaHat=betaHat,gammaHat=gammaHat,zScores=zScores,pValues=pValues,ciMatrix=ciMatrix,variance=variance,pseudolikelihood=result$value))
   }
 
   #if bootstrap
@@ -160,7 +160,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="boot",burnIn=300,nBoot=500){
   ciQuantile=qnorm(1-(1-ciLevel)/2)
   colnames(ciMatrix)=c("lower","upper")
   rownames(ciMatrix)=varianceNames
-  return(list(betaHat=betaHat,gammaHat=gammaHat,pValues=pValues,ciMatrix=ciMatrix,variance=variance,bootStrapSamples=betaGammaMatrix))
+  return(list(betaHat=betaHat,gammaHat=gammaHat,pValues=pValues,ciMatrix=ciMatrix,variance=variance,bootStrapSamples=betaGammaMatrix,pseudolikelihood=result$value))
 }
 
 MPLE_summary<-function(fit){
