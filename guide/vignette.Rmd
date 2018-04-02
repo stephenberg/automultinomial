@@ -183,7 +183,7 @@ Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left pl
 
 ###Fitting an autologistic model to the data (K=2 categories)
 
-Now we'll fit an autologistic model using the MPLE function. Then, we will examine confidence intervals for the fitted parameters. By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator to confidence intervals based on the parametric bootstrap. The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals. To compute bootstrap confidence intervals, set method="boot". We will set the number of bootstrap samples using the nBoot argument.
+Now we'll fit an autologistic model using the MPLE function. Then, we will examine confidence intervals for the fitted parameters. By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator. The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals. To compute bootstrap confidence intervals, set method="boot". We will set the number of bootstrap samples using the nBoot argument.
 
 We can use the MPLE_summary function to view the model summary in table form.
 ```{r}
