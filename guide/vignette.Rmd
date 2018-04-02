@@ -128,7 +128,14 @@ Here, we will demonstrate how to simulate data using automultinomial, how to fit
 
 ###Simulating data
 
-Generating simulated data using the function drawSamples().
+Generating simulated data using the function drawSamples(). The drawSamples function takes the following arguments:
+
+* beta: the $p\times 1$ coefficient vector (for $K=2$ response categories) or the $p\times (K-1)$ coefficient matrix (for $K>2$ response categories)
+* gamma: the value of the correlation parameter
+* X: the $n\times p$ design matrix $X=[x_1,x_2,...,x_n]^T$
+* A: a square symmetric adjacency matrix encoding the neighborhood structure
+* burnIn: the number of burnIn iterations for the Gibbs sampler. Safe to leave at the default of 300.
+* nSamples: the number of simulated samples to draw.
 
 ```{r}
 library(automultinomial2)
@@ -183,7 +190,20 @@ Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left pl
 
 ###Fitting an autologistic model to the data (K=2 categories)
 
-Now we'll fit an autologistic model using the MPLE function. Then, we will examine confidence intervals for the fitted parameters. By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator. The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals. To compute bootstrap confidence intervals, set method="boot". We will set the number of bootstrap samples using the nBoot argument.
+Now we'll fit an autologistic model using the MPLE function. The MPLE function takes 3 primary arguments: 
+
+* X: the design matrix $X=[x_1,x_2,...,x_n]^T$
+* A: a square symmetric adjacency matrix encoding the neighborhood structure
+* y: the response vector $y$, which is required by MPLE to be a factor vector.
+
+There are also several secondary arguments.
+
+* ciLevel: for $xy$% confidence intervals, set ciLevel to $0.xy$ (the default is ciLevel=0.95, which produces 95% confidence intervals)
+* method: By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator. For bootstrap confidence intervals, use method="boot". The default is method="asymptotic".
+* burnIn: the number of burnIn iterations for the Gibbs sampler for method="boot". Safe to leave at the default of 300.
+* nBoot: the number of bootstrap samples to use for making bootstrap confidence intervals.
+
+After fitting the model, we will examine confidence intervals for the fitted parameters.  The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals.
 
 We can use the MPLE_summary function to view the model summary in table form.
 ```{r}
