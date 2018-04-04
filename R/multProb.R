@@ -187,8 +187,6 @@ MPLE_summary<-function(fit){
 
 
   bhat=round(fit$betaHat,digits=3)
-  ciMat=round(fit$ciMatrix,digits=3)
-  ciTable=bhat
   bhat=as.matrix(bhat)
 
   count=1
