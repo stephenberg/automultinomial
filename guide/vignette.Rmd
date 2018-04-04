@@ -71,7 +71,7 @@ p(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\boldsymbol{\be
 
 The term $\sum_{\mathbf{z'}}$ indicates a sum over all possible categorical responses for the entire dataset.
 
-Some intuition regarding \eqref{density} can be gained as follows: when $\gamma=0$, then $\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)=0$ so that the $z_i$ are completely independent. In this case the autologistic (automultinomial) model is the same as an ordinary logistic (multinomial logit) model. On the other hand, when $\gamma>0$, then response configurations $\mathbf{z}$ where $z_i=z_{i'}$ for many neighbor pairs $i\sim i'$ becomes more likely. In this way, $\gamma$ incorporates positive spatial correlation into the responses. When $\gamma<0$, we expect neighboring $z_i,z_{i'}$ to *disagree* more frequently than if the $z_i$ were independent, and the $\gamma<0$ case will in practice be less common.
+Some intuition regarding \eqref{density} can be gained as follows: when $\gamma=0$, then $\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)=0$ so that the $z_i$ are completely independent. In this case the autologistic (automultinomial) model is the same as an ordinary logistic (multinomial logit) model. On the other hand, when $\gamma>0$, then response configurations $\mathbf{z}$ where $z_i=z_{i'}$ for many neighbor pairs $i\sim i'$ become more likely. In this way, $\gamma$ incorporates positive spatial correlation into the responses. When $\gamma<0$, we expect neighboring $z_i,z_{i'}$ to *disagree* more frequently than if the $z_i$ were independent, and the $\gamma<0$ case will in practice be less common.
 
 ###Estimating $\boldsymbol{\beta}$ and $\gamma$
 
@@ -88,19 +88,19 @@ Fortunately, a proposal of (Besag, 1974) provides a consistent estimation proced
 over $\boldsymbol{\beta}$ and $\gamma$. The expression $p(z_i|z_{-i},\boldsymbol{\beta},\gamma)$ refers to the conditional density of $z_i$ given the sites at all of the other grid locations. A short calculation based on equation \eqref{density} shows that for $K=2$,
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
-p(z_i=2|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
+p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p1}\\
+p(z_i=2|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p2}
 \end{eqnarray}
 
 For $K\geq 2$ response categories, we have 
 
 \begin{eqnarray}
-p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
+p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
 \end{eqnarray}
 
 and for $k>1$,
 \begin{eqnarray}
-p(z_i=k|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_kI(z_i=k+1)+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
+p(z_i=k|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
 \end{eqnarray}
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} are plugged into equation \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\boldsymbol{\beta}$ and $\gamma$ using the function optim.
@@ -128,7 +128,7 @@ Here, we will demonstrate how to simulate data using automultinomial, how to fit
 
 ###Simulating data
 
-Generating simulated data using the function drawSamples(). The drawSamples function takes the following arguments:
+First we will use the drawSamples() function to simulate some data from the autologistic model. The drawSamples function takes the following arguments:
 
 * beta: the $p\times 1$ coefficient vector (for $K=2$ response categories) or the $p\times (K-1)$ coefficient matrix (for $K>2$ response categories)
 * gamma: the value of the correlation parameter
@@ -367,25 +367,25 @@ p(z_i=1|z_{-i})=\frac{1}{1+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\
 This form of the conditional distributions corresponds to the model 
 
 \begin{eqnarray}
-p_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\boldsymbol{\beta},\gamma)\}}\label{asym}
+p_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H_{asy}(\mathbf{z'}|\boldsymbol{\beta},\gamma)\}}\label{asym}
 \end{eqnarray} where \begin{eqnarray}
 H_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}I(z_i=z_{i'}=2)
 \end{eqnarray}
 
-By the Hammersley-Clifford theorem, the density in equation \eqref{asym} is the unique joint distribution corresponding to the conditions distributions in equation \eqref{p12}.
+By the Hammersley-Clifford theorem, the density in equation \eqref{asym} is the unique joint distribution corresponding to the conditional distributions in equation \eqref{p12}.
 
 \textbf{Parameterization 2 (Symmetric)}: This parameterization is sometimes referred to as the $\pm 1$ parameterization. We will now show that for $K=2$, the symmetric parameterization is equivalent to the parameterization used by automultinomial. On the other hand, the formulation given for the automultinomial parameterization in section 1 is much more cleanly generalized to $K>2$ categories.
 
 In the symmetric parameterization, the set of allowed outcomes is taken to be $\{-1,1\}$, and the conditional probabilities at each site are \begin{eqnarray}
-p(z_i=1|z_{-i})=\frac{\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}}{1+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}
+p(z_i=1|z_{-i})=\frac{\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}{1+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}
 \end{eqnarray}
 
 Now, as with the asymmetric model, we will map the response set $\{-1,1\}$ to $\{1,2\}$. We will identify $-1$ with $1$ and $1$ with $2$, so that the conditional probabilities become
 
 \begin{eqnarray}
-p(z_i=2|z_{-i})=\frac{\exp\left[x_i^T\beta+\gamma\sum_{i'\sim i}\{I(z_{i'}=2)-I(z_{i'}=1)\}\right]}{1+\exp\left[x_i^T\beta+\gamma\sum_{i'\sim i}\{I(z_{i'}=2)-I(z_{i'}=1)\}\right]\}}\\
-\frac{\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\\
-p(z_i=1|z_{-i})=\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta I(z_i=2)+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p22}
+p(z_i=2|z_{-i})&=&\frac{\exp\left[x_i^T\beta+\gamma\sum_{i'\sim i}\{I(z_{i'}=2)-I(z_{i'}=1)\}\right]}{1+\exp\left[x_i^T\beta+\gamma\sum_{i'\sim i}\{I(z_{i'}=2)-I(z_{i'}=1)\}\right]}\\
+&=&\frac{\exp\{x_i^T\beta +\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\\
+p(z_i=1|z_{-i})&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}I(z_{i'}=2)\}}\label{p22}
 \end{eqnarray}
 
 This form of the conditional distributions corresponds to the model 
@@ -398,7 +398,7 @@ p_{sym}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H_{sym}(\mathbf{z}|\bo
 H_{sym}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{2}I(z_i=z_{i'}=k)\label{hsym}
 \end{eqnarray}
 
-By the Hammersley-Clifford theorem, the density in equation \eqref{sym} is the unique joint distribution corresponding to the conditions distributions in equation \eqref{p22}.
+By the Hammersley-Clifford theorem, the density in equation \eqref{sym} is the unique joint distribution corresponding to the conditional distributions in equation \eqref{p22}.
 
 
 \textbf{Parameterization 3: the parameterization used in automultinomial}: This parameterization is the parameterization defined in section 2 of this document.
