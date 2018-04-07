@@ -98,9 +98,9 @@ For $K\geq 2$ response categories, we have
 p(z_i=1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p3}
 \end{eqnarray}
 
-and for $k>1$,
+and for $1\leq k<K$,
 \begin{eqnarray}
-p(z_i=k|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
+p(z_i=k+1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
 \end{eqnarray}
 
 In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} are plugged into equation \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\boldsymbol{\beta}$ and $\gamma$ using the function optim.

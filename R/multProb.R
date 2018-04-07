@@ -277,41 +277,6 @@ logPseudolikelihoodGradient<-function(betaGammaVector,yNumeric,X,neighborRespons
   return(fullGradient)
 }
 
-# logPseudolikelihoodHessian<-function(betaGammaVector,yNumeric,X,neighborResponses){
-#   #problem dimensions
-#   K=dim(neighborResponses)[2]
-#   n=dim(neighborResponses)[1]
-#   p=dim(X)[2]
-#
-#
-#   betaVector=betaGammaVector[1:(length(betaGammaVector)-1)]
-#   gamma=betaGammaVector[length(betaGammaVector)]
-#   beta=matrix(betaVector,ncol=K-1)
-#
-#   condProbs=X%*%beta
-#   condProbs=condProbs+gamma*(neighborResponses[,2:K,drop=FALSE]-neighborResponses[,1])
-#   condProbs=cbind(rep(0,n),condProbs)
-#   for (i in 1:n){
-#     condProbs[i,]=condProbs[i,]-max(condProbs[i,])
-#     condProbs[i,]=exp(condProbs[i,])
-#     condProbs[i,]=condProbs[i,]/sum(condProbs[i,])
-#   }
-#
-#
-#   hessian=matrix(0,p*(K-1)+1,p*(K-1)+1)
-#   weights=rep(0,(K-1)*n)
-#   for (i in 1:n){
-#     varI=diag(condProbs[i,,drop=TRUE])-condProbs[i,,drop=TRUE]%*%t(condProbs[i,,drop=FALSE])
-#     xtxi=X[i,,drop=TRUE]%*%X[i,,drop=FALSE]
-#     for (k1 in 1:(K-1)){
-#       for (k2 in 1:(K-1)){
-#         hessian[((k1-1)*p)+1):((k1*p)),((k2-1)*p)+1):((k2*p))]=hessian[((k1-1)*p)+1):((k1*p)),((k2-1)*p)+1):((k2*p))]+xtxi*varI[k1,k2]
-#       }
-#     }
-#   }
-#
-# }
-
 pointWiseGradient<-function(betaGammaVector,yNumeric,X,neighborResponses){
   #problem dimensions
   K=dim(neighborResponses)[2]
