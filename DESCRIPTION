@@ -1,6 +1,6 @@
 Package: automultinomial2
 Type: Package
-Title: Models for spatially correlated data
+Title: Models for Spatially Correlated Data
 Version: 0.1.0
 Author: Stephen Berg, Rao Fu, Jun Zhu
 Imports: Matrix, igraph, numDeriv, knitr, stats, ggplot2
