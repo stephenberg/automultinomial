@@ -3,14 +3,14 @@
 #' Fits an autologistic model or automultinomial model. Takes as arguments
 #' a design matrix X, a response vector y (in factor form), and a square
 #' symmetric adjacency matrix encoding the neighborhood structure.
-#' When the number of levels of the response y is >2, the function fits the
+#' When the number of levels of the response y is >2, the function fits a
 #' multicategory generalization of the autologistic model. For a full description
-#' of the models and a user guide, please see the vignette.
+#' of the models the package fits and a user guide, please see the vignette.
 #'
 #'@param X the n-by-p design matrix
 #'@param y the response vector (required to be a factor)
 #'@param A the square symmetric adjacency matrix A encoding the neighborhood structure
-#'@param ciLevel the confidence level to be used for inference. Defaults to 95 percent intervals.
+#'@param ciLevel the confidence level to be used for inference. Defaults to 0.95 for 95 percent intervals.
 #'@param method "boot" for parametric bootstrap and "asymptotic" for asymptotic confidence intervals.
 #'@param burnIn the number of burnin samples to use for the Gibbs sampler when method="boot"
 #'@param nBoot the number of bootstrap samples to use when method="boot"

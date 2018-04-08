@@ -2,14 +2,18 @@
 knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE----------------------------------------------------------
+#  install.packages("automultinomial")
+#  library(automultinomial)
+
+## ----eval=FALSE----------------------------------------------------------
 #  install.packages("devtools")
 
 ## ----eval=FALSE----------------------------------------------------------
-#  devtools::install_github(repo="stephenberg/automultinomial2")
-#  library(automultinomial2)
+#  devtools::install_github(repo="stephenberg/automultinomial")
+#  library(automultinomial)
 
 ## ------------------------------------------------------------------------
-library(automultinomial2)
+library(automultinomial)
 set.seed(33)
 
 #10 predictors
@@ -53,8 +57,8 @@ load("data/2category.RData")
 ## ----eval=FALSE----------------------------------------------------------
 #  # responses must be input as a factor
 #  y=factor(y)
-#  fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-#  fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+#  fit1=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+#  fit2=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
 
 ## ------------------------------------------------------------------------
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
@@ -85,7 +89,6 @@ p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
 p1
 
 ## ------------------------------------------------------------------------
-library(automultinomial2)
 set.seed(42)
 
 #10 predictors
@@ -130,8 +133,8 @@ load("data/3category.RData")
 ## ----eval=FALSE----------------------------------------------------------
 #  #responses must be input as a factor
 #  y=factor(y)
-#  fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
-#  fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+#  fit1=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
+#  fit2=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
 
 ## ------------------------------------------------------------------------
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
@@ -183,14 +186,14 @@ gamma=0.5
 
 ## ----eval=FALSE----------------------------------------------------------
 #  #simulated responses
-#  y=automultinomial2::drawSamples(beta=beta,gamma=gamma,X = X_intercept, A=a1,nSamples = 1)
+#  y=drawSamples(beta=beta,gamma=gamma,X = X_intercept, A=a1,nSamples = 1)
 
 ## ----echo=FALSE----------------------------------------------------------
 load("data/paramExample.RData")
 
 ## ------------------------------------------------------------------------
 fitAsymmetric=glm(factor(y)~cbind(X,as.matrix(a1%*%(y-1))),family=binomial())
-fitAutomultinomial=automultinomial2::MPLE(X=X_intercept,y=factor(y),A = a1,method="asymptotic")
+fitAutomultinomial=MPLE(X=X_intercept,y=factor(y),A = a1,method="asymptotic")
 
 #comparing pseudolikelihoods: identical
 fitAsymmetric$deviance/-2
@@ -213,13 +216,13 @@ interceptAutomultinomial-4*gammaAutomultinomial
 
 ## ------------------------------------------------------------------------
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1))),family=binomial())
-fitAutomultinomial1=automultinomial2::MPLE(X=X_intercept,y=factor(y),A = a2,method="asymptotic")
+fitAutomultinomial1=MPLE(X=X_intercept,y=factor(y),A = a2,method="asymptotic")
 
 #refitting with different reference category
 y2=as.factor(y)
 y2=as.numeric(relevel(y2,ref = "2"))
 fitAsymmetric2=glm(factor(y2)~cbind(X,as.matrix(a2%*%(y2-1))),family=binomial())
-fitAutomultinomial2=automultinomial2::MPLE(X=X_intercept,y=factor(y2),A = a2,method="asymptotic")
+fitAutomultinomial2=MPLE(X=X_intercept,y=factor(y2),A = a2,method="asymptotic")
 
 
 #comparing pseudolikelihoods: not identical
@@ -248,13 +251,13 @@ gammaAutomultinomial2
 
 ## ------------------------------------------------------------------------
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1)))-1,family=binomial())
-fitAutomultinomial1=automultinomial2::MPLE(X=X,y=factor(y),A = a2,method="asymptotic")
+fitAutomultinomial1=MPLE(X=X,y=factor(y),A = a2,method="asymptotic")
 
 #refitting with different reference category
 y2=as.factor(y)
 y2=as.numeric(relevel(y2,ref = "2"))
 fitAsymmetric2=glm(factor(y2)~cbind(X,as.matrix(a2%*%(y2-1)))-1,family=binomial())
-fitAutomultinomial2=automultinomial2::MPLE(X=X,y=factor(y2),A = a2,method="asymptotic")
+fitAutomultinomial2=MPLE(X=X,y=factor(y2),A = a2,method="asymptotic")
 
 
 #comparing pseudolikelihoods: not identical
