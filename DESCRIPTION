@@ -3,9 +3,12 @@ Type: Package
 Title: Models for spatially correlated data
 Version: 0.1.0
 Author: Stephen Berg, Rao Fu, Jun Zhu
-Imports: Matrix, igraph, numDeriv, knitr, devtools
+Imports: Matrix, igraph, numDeriv, knitr, stats, ggplot2
+Suggests: utils
 Maintainer: Stephen Berg <saberg2@wisc.edu>
-Description: Fits the autologistic model as described in Besag's famous 1974 paper. Fits the multicategory generalization of the autologistic model when there are more than 2 response categories. Provides support for both asymptotic and bootstrap confidence intervals.
-License: MIT
+Description: Fits the autologistic model as described in Besag's famous 1974 paper. Fits the multicategory generalization of the autologistic model when there are more than 2 response categories. Provides support for both asymptotic and bootstrap confidence intervals. For full details, please see the vignette.
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.0.1
+VignetteBuilder: knitr

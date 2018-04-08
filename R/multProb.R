@@ -1,5 +1,34 @@
+#' Maximum pseudolikelihood estimation
+#'
+#' Fits an autologistic model or automultinomial model. Takes as arguments
+#' a design matrix X, a response vector y (in factor form), and a square
+#' symmetric adjacency matrix encoding the neighborhood structure.
+#' When the number of levels of the response y is >2, the function fits the
+#' multicategory generalization of the autologistic model. For a full description
+#' of the models and a user guide, please see the vignette.
+#'
+#'@param X the n-by-p design matrix
+#'@param y the response vector (required to be a factor)
+#'@param A the square symmetric adjacency matrix A encoding the neighborhood structure
+#'@param ciLevel the confidence level to be used for inference. Defaults to 95 percent intervals.
+#'@param method "boot" for parametric bootstrap and "asymptotic" for asymptotic confidence intervals.
+#'@param burnIn the number of burnin samples to use for the Gibbs sampler when method="boot"
+#'@param nBoot the number of bootstrap samples to use when method="boot"
+#'@return a fitted auto- model MPLE object
+#'@import stats
+#'@export
 MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
+  if ((ciLevel<=0) |(ciLevel>=1)){
+    stop(cat("Error: ciLevel must satisfy 0<ciLevel<1\n"))
+  }
+
+  if ((burnIn<1)){
+    stop(cat("Error: burnIn must be a positive integer\n"))
+  }
+  if ((nBoot<1)){
+    stop(cat("Error: nBoot must be a positive integer\n"))
+  }
   if (method!="boot"){
     if (method!="asymptotic"){
       stop(cat("Error: method should be one of \"boot\" or \"asymptotic\", for bootstrap\n or asymptotic inference, respectively.\n"))
@@ -7,7 +36,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
   }
   ####argument type checking
   if (!is.matrix(X)){
-    stop(cat("Error: X is not a matrix. Please input a matrix for x.\n"))
+    stop(cat("Error: X is not a matrix. Please input a matrix for X.\n"))
   }
   if (!is.factor(y)){
     stop(cat("Error: y is not a factor. Please input y as a factor vector.\n"))
@@ -50,12 +79,12 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
   #test for zero diagonals
   if (max(abs(Matrix::diag(A)))>10^{-9}){
-    stop(cat("Error: diagonal entries of A should be 0."))
+    stop(cat("Error: diagonal entries of A should be 0.\n"))
   }
 
   #symmetry check
   if (!Matrix::isSymmetric(A,tol=10^{-9})){
-    stop(cat("Error: A should be a symmetric matrix"))
+    stop(cat("Error: A should be a symmetric matrix\n"))
   }
 
   #test for bad input response vector
@@ -68,6 +97,10 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
   #no weighting schemes
   A=1.0*(A>0)
+
+  if (sum(A>0)==0){
+    stop(cat("Error: no non-zero entries in A"))
+  }
 
   #create beta matrix
   beta=matrix(0,p,K-1)
@@ -163,47 +196,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
   return(list(betaHat=betaHat,gammaHat=gammaHat,pValues=pValues,ciMatrix=ciMatrix,variance=variance,bootStrapSamples=betaGammaMatrix,pseudolikelihood=result$value))
 }
 
-MPLE_summary<-function(fit){
 
-  bhat=round(fit$betaHat,digits=3)
-  ciMat=round(fit$ciMatrix,digits=3)
-  ciTable=bhat
-
-  bhat=as.matrix(bhat)
-  count=1
-  for (q in 1:dim(bhat)[2]){
-    for (p in 1:dim(bhat)[1]){
-
-      bhat[p,q]=paste(bhat[p,q],paste("(",ciMat[count,1],",",ciMat[count,2],")",sep=""),sep=" ")
-      count=count+1
-    }
-  }
-  gammaVec=paste(round(fit$gammaHat,digits=3),paste("(",ciMat[count,1],",",ciMat[count,2],")",sep=""))
-  gammaVec=c(gammaVec,rep("",dim(bhat)[1]-1))
-  bhat=cbind(bhat,gammaVec)
-  colnames(bhat)[dim(bhat)[2]]<-"gamma"
-  print(knitr::kable(bhat,caption="Summary with confidence intervals",row.names=TRUE))
-  ciTable=knitr::kable(bhat,caption="Summary with confidence intervals",row.names=TRUE)
-
-
-  bhat=round(fit$betaHat,digits=3)
-  bhat=as.matrix(bhat)
-
-  count=1
-  for (q in 1:dim(bhat)[2]){
-    for (p in 1:dim(bhat)[1]){
-      bhat[p,q]=paste(bhat[p,q],paste("(",round(fit$pValues[count],digits=3),")",sep=""),sep=" ")
-      count=count+1
-    }
-  }
-  gammaVec=paste(round(fit$gammaHat,digits=3),paste("(",round(fit$pValues[count],digits=3),")",sep=""))
-  gammaVec=c(gammaVec,rep("",dim(bhat)[1]-1))
-  bhat=cbind(bhat,gammaVec)
-  colnames(bhat)[dim(bhat)[2]]<-"gamma"
-  print(knitr::kable(bhat,caption="Summary with p-values",row.names=TRUE))
-  pValueTable=knitr::kable(bhat,caption = "Summary with p-values",row.names=TRUE)
-  return(list(ciTable=ciTable,pValueTable=pValueTable))
-}
 
 varianceComputer<-function(hessian,scoreMatrix,A){
   A_Diagonal=Matrix::Diagonal(dim(A)[1])+A
@@ -321,7 +314,6 @@ bootStrap<-function(betaGammaVector,yNumeric,X,neighborResponses,burnIn=300,nBoo
   gamma=betaGammaVector[length(betaGammaVector)]
   beta=matrix(betaVector,ncol=K-1)
   z=matrix(0,n,K)
-  yNumeric=as.numeric(y)
   for (i in 1:n){
     z[i,yNumeric[i]]=1
   }
@@ -404,81 +396,4 @@ bootStrap<-function(betaGammaVector,yNumeric,X,neighborResponses,burnIn=300,nBoo
     }
   }
   return(betaGammaMatrix)
-}
-
-
-drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
-  p=dim(X)[2]
-  n=dim(X)[1]
-  beta=as.matrix(beta)
-  K=dim(as.matrix(beta))[2]+1
-  z=matrix(0,n,K)
-  z[,1]=rep(1,n)
-
-  #first, do Gibbs sampling for burn-in iterations, starting from initial configuration
-  #yNumeric
-  indices=Matrix::summary(Matrix::Matrix(A>0,sparse=TRUE))
-
-  nNeighbors=rep(0,n)
-  for (i in 1:n){
-    if (!(i%in%indices[,2])){
-      nNeighbors[i]=0
-    }
-    if ((i%in%indices[,2])){
-      nNeighbors[i]=sum(indices[,2]==i)
-    }
-  }
-  neighbors=indices[,1]
-  neighborStart=c(0,cumsum(nNeighbors)[1:(n-1)])+1
-  neighborEnd=cumsum(nNeighbors)
-  linPred=X%*%beta
-  linPred=cbind(rep(0,n),linPred)
-  cat("Burn-in samples\n")
-  for (i in 1:burnIn){
-    for (j in 1:n){
-      neighborCount_j=rep(0,K)
-      if (nNeighbors[j]>0){
-        j_neighbors=neighbors[neighborStart[j]:neighborEnd[j]]
-        for (q in 1:length(j_neighbors)){
-          neighborCount_j=neighborCount_j+z[j_neighbors[q],]
-        }
-      }
-      cProbs_j=linPred[j,]+gamma*neighborCount_j
-      cProbs_j=cProbs_j-max(cProbs_j)
-      cProbs_j=exp(cProbs_j)
-      cProbs_j=cProbs_j/sum(cProbs_j)
-      z[j,]=rmultinom(1,1,cProbs_j)
-    }
-    if (i%%100==0){
-      cat(paste(i," burn-in samples so far\n"))
-    }
-  }
-
-  sampleMatrix=matrix(0,n,nSamples)
-
-  ##############
-  #now draw samples
-  cat("Drawing samples\n")
-  for (i in 1:nSamples){
-    for (j in 1:n){
-      neighborCount_j=rep(0,K)
-      if (nNeighbors[j]>0){
-        j_neighbors=neighbors[neighborStart[j]:neighborEnd[j]]
-        for (q in 1:length(j_neighbors)){
-          neighborCount_j=neighborCount_j+z[j_neighbors[q],]
-        }
-      }
-      cProbs_j=linPred[j,]+gamma*neighborCount_j
-      cProbs_j=cProbs_j-max(cProbs_j)
-      cProbs_j=exp(cProbs_j)
-      cProbs_j=cProbs_j/sum(cProbs_j)
-      z[j,]=rmultinom(1,1,cProbs_j)
-    }
-    sampleMatrix[,i]=apply(z,1,which.max)
-    ##status printout
-    if (i%%100==0){
-      cat(paste(i," samples so far\n"))
-    }
-  }
-  return(sampleMatrix)
 }

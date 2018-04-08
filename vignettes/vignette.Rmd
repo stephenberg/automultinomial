@@ -1,7 +1,7 @@
 ---
 title: "Automultinomial Vignette"
 author: "Stephen Berg"
-date: "March 27, 2018"
+date: "'r Sys.Date()'"
 output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Automultinomial Vignette}
@@ -128,7 +128,7 @@ Here, we will demonstrate how to simulate data using automultinomial, how to fit
 
 ###Simulating data
 
-First we will use the drawSamples() function to simulate some data from the autologistic model. The drawSamples function takes the following arguments:
+First we will use the drawSamples() function to simulate some data from the autologistic model. The drawSamples() function takes the following arguments:
 
 * beta: the $p\times 1$ coefficient vector (for $K=2$ response categories) or the $p\times (K-1)$ coefficient matrix (for $K>2$ response categories)
 * gamma: the value of the correlation parameter
@@ -137,6 +137,7 @@ First we will use the drawSamples() function to simulate some data from the auto
 * burnIn: the number of burnIn iterations for the Gibbs sampler. Safe to leave at the default of 300.
 * nSamples: the number of simulated samples to draw.
 
+First, we will set up the simulation parameters:
 ```{r}
 library(automultinomial2)
 set.seed(33)
@@ -160,7 +161,11 @@ X=matrix(rnorm(n^2*p),ncol=p)
 
 #set the correlation parameter value (0.7 is a moderate amount of spatial correlation)
 gamma=0.7
+```
 
+
+Then, we will use the drawSamples() function to generate simulated data.
+```{r,eval=FALSE}
 #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
@@ -205,13 +210,19 @@ There are also several secondary arguments.
 
 After fitting the model, we will examine confidence intervals for the fitted parameters.  The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals.
 
-We can use the MPLE_summary function to view the model summary in table form.
-```{r}
+First, we will fit the model using the MPLE() function.
+```{r,echo=FALSE}
+load("data/2category.RData")
+```
+```{r,eval=FALSE}
 # responses must be input as a factor
 y=factor(y)
 fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
 fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+```
 
+Then, we can use the MPLE_summary() function to view the model summary in table form.
+```{r}
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
 #str(fit1)
 #str(fit2)
@@ -273,7 +284,9 @@ X=matrix(rnorm(n^2*p),ncol=p)
 
 #set the correlation parameter value (0.7 is a moderate amount of spatial correlation)
 gamma=0.7
+```
 
+```{r,eval=FALSE}
 #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
@@ -303,12 +316,17 @@ Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On 
 
 ###Fitting an automultinomial model to the data (K=3 categories)
 
-```{r}
+```{r,echo=FALSE}
+load("data/3category.RData")
+```
+```{r,eval=FALSE}
 #responses must be input as a factor
 y=factor(y)
 fit1=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
 fit2=automultinomial2::MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
+```
 
+```{r}
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
 #str(fit1)
 #str(fit2)
@@ -432,15 +450,19 @@ X_intercept=cbind(rep(1,1600),X)
 
 beta=rnorm(3)
 gamma=0.5
+```
 
-#random responses
+```{r,eval=FALSE}
+#simulated responses
 y=automultinomial2::drawSamples(beta=beta,gamma=gamma,X = X_intercept, A=a1,nSamples = 1)
 ```
 
 \textbf{Case 1: same number of neighbors, covariate matrix includes intercept}
 
 Here, we see that the pseudolikelihoods match and that coefficients (excepting $\gamma$ and the intercept) also match. The intercept and $\gamma$ from the two models are related by a simple linear transformation.
-
+```{r,echo=FALSE}
+load("data/paramExample.RData")
+```
 ```{r}
 fitAsymmetric=glm(factor(y)~cbind(X,as.matrix(a1%*%(y-1))),family=binomial())
 fitAutomultinomial=automultinomial2::MPLE(X=X_intercept,y=factor(y),A = a1,method="asymptotic")
