@@ -1,7 +1,7 @@
 ---
 title: "Automultinomial Vignette"
 author: "Stephen Berg"
-date: "'r Sys.Date()'"
+date: "`r Sys.Date()`"
 output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Automultinomial Vignette}
@@ -359,7 +359,7 @@ p1
 
 \section{A comparison of different autologistic parameterizations}
 
-Finally, we'll conclude with a discussion of different parameterizations of the autologistic model. We will focus on the case $K=2$ here. The goal for now is to show by example that the automultinomial parameterization will be invariant to the choice of reference category (not guaranteed by all of the parameterizations) and to give some concrete data examples.
+Finally, we'll conclude with a discussion of different parameterizations of the autologistic model. We will focus on the case $K=2$ here. The goal for now is to show by example that the parameterization used by automultinomial will be invariant to the choice of reference category (not guaranteed by all of the parameterizations) and to give some concrete data examples.
 
 ###Commonly used autologistic parameterizations
 
@@ -422,11 +422,11 @@ By the Hammersley-Clifford theorem, the density in equation \eqref{sym} is the u
 \textbf{Parameterization 3: the parameterization used in automultinomial}: This parameterization is the parameterization defined in section 2 of this document.
 
 \subsection{Comparison}
-Having defined the 3 parameterizations, we will now compare them. Our first conclusion is that when $K=2$, the symmetric ($\pm 1$ ) parameterization is *exactly* equivalent to the automultinomial parameterization. This conclusion follows from determining that the energies in equations \eqref{H} and \eqref{hsym} are exactly the same, so that the densities in equation \eqref{sym} and \eqref{density} are exactly the same.
+Having defined the 3 parameterizations, we will now compare them. Our first conclusion is that when $K=2$, the symmetric ($\pm 1$ ) parameterization is *exactly* equivalent to the parameterization used by automultinomial. This conclusion follows from determining that the energies in equations \eqref{H} and \eqref{hsym} are exactly the same, so that the densities in equation \eqref{sym} and \eqref{density} are exactly the same.
 
 Therefore, from now on we need only compare the automultinomial parameterization and the asymmetric parameterization. The following statements can be shown:
 
-* When each site has the same number of neighbors, and the covariate matrix $X=[x_1,x_2,...,x_n]^T$ includes an intercept column, then the asymmetric and the automultinomial parameterizations are equivalent, in the sense that any joint distribution in the automultinomial parameterization has an equivalent representation in the asymmetric parameterization. The pseudolikelihoods obtained by fitting the automultinomial and the asymmetric parameterizations to a dataset will be identical. The coefficients from the automultinomial parameterization can be obtained from the asymmetric parameterization, and vice versa.
+* When each site has the same number of neighbors, and the covariate matrix $X=[x_1,x_2,...,x_n]^T$ includes an intercept column, then the asymmetric and the parameterization used in automultinomial are equivalent, in the sense that any joint distribution in the automultinomial parameterization has an equivalent representation in the asymmetric parameterization. The pseudolikelihoods obtained by fitting the automultinomial and the asymmetric parameterizations to a dataset will be identical. The coefficients from the automultinomial parameterization can be obtained from the asymmetric parameterization, and vice versa.
 * When the number of neighbors at each site is different, and/or the covariate matrix does not include an intercept column, then the asymmetric and the automultinomial parameterizations will in general *not* be equivalent. The automultinomial parameterization is invariant to the choice of reference category, whereas the asymmetric parameterization will in general not be invariant to the choice of reference category.
 
 We will now give some examples on simulated data. 
