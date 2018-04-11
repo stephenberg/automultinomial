@@ -1,7 +1,7 @@
-## New version 2.0.0
+## Resubmission of version 2.0.0
 This is a new version of a package currently on cran. In this version I have:
 
-* Added a vignette with guide to use
+* Added a vignette with guide to use, now with compressed pdf
 
 * Added type checking of user input to give more informative error messages
 
