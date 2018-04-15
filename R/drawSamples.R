@@ -11,6 +11,26 @@
 #'@param nSamples the number of samples to draw
 #'@return simulated samples
 #'@import stats
+#'@examples 
+#' ##########generating coefficient values and data
+#' #adjacency matrix A
+#' A=igraph::get.adjacency(igraph::make_lattice(c(40,40)))
+#' 
+#' #design matrix
+#' X=cbind(rep(1,1600),matrix(rnorm(1600*4),ncol=4))
+#' 
+#' #correlation parameter
+#' gamma=0.6
+#' 
+#' #2 response categories
+#' beta2=rnorm(5)*0.3
+#' #This example uses a short burnIn period. Use a longer burnIn in practice.
+#' y2=drawSamples(beta2,gamma,X,A,burnIn=100,nSamples=1)
+#' 
+#' #3 response categories (not run)
+#' #beta3=rnorm(5)*0.3
+#' #y3=drawSamples(beta3,gamma,X,A,nSamples=1)
+#' ##########
 #'@export
 drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
   if ((!is.double(gamma))|(length(gamma)>1)){
@@ -31,7 +51,10 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
       stop(cat("Error: number of rows in A not equal to number of columns in A.\n"))
     }
   }
+  
+  
   #test for bad A dimensions
+  n=nrow(X)
   if (n!=nrow(A)){
     stop(cat("Error: number of rows of A not equal to number rows in X matrix.\n"))
   }
