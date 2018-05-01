@@ -91,7 +91,7 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
   z=matrix(0,n,K)
   
   #random initialization
-  zCategories=rmultinom(n,1,prob=rep(1/K,K))
+  zCategories=t(rmultinom(n,1,prob=rep(1/K,K)))
   zCategories=apply(zCategories,1,which.max)
   for (i in 1:n){
     z[i,zCategories[i]]=1
