@@ -89,8 +89,14 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
   beta=as.matrix(beta)
   K=dim(as.matrix(beta))[2]+1
   z=matrix(0,n,K)
-  z[,1]=rep(1,n)
-
+  
+  #random initialization
+  zCategories=rmultinom(n,1,prob=rep(1/K,K))
+  zCategories=apply(zCategories,1,which.max)
+  for (i in 1:n){
+    z[i,zCategories[i]]=1
+  }
+  
   #first, do Gibbs sampling for burn-in iterations, starting from initial configuration
   #yNumeric
   indices=Matrix::summary(Matrix::Matrix(A>0,sparse=TRUE))
