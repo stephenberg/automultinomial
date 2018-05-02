@@ -369,7 +369,9 @@ bootStrap<-function(betaGammaVector,yNumeric,X,neighborResponses,burnIn=300,nBoo
       if (nNeighbors[j]>0){
         j_neighbors=neighbors[neighborStart[j]:neighborEnd[j]]
         for (q in 1:length(j_neighbors)){
-          neighborCount_j=neighborCount_j+z[j_neighbors[q],]
+          if (j_neighbors[q]!=j){
+            neighborCount_j=neighborCount_j+z[j_neighbors[q],]
+          }
         }
       }
       cProbs_j=linPred[j,]+gamma*neighborCount_j
