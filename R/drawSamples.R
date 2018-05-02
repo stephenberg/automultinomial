@@ -9,6 +9,7 @@
 #'@param A the (square symmetric) adjacency matrix encoding the neighborhood structure
 #'@param burnIn the number of burnin samples to be used. Defaults to 300
 #'@param nSamples the number of samples to draw
+#'@param y optional starting configuration, in factor form. Defaults to NULL
 #'@return simulated samples
 #'@import stats
 #'@examples 
@@ -32,7 +33,7 @@
 #' #y3=drawSamples(beta3,gamma,X,A,nSamples=1)
 #' ##########
 #'@export
-drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
+drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
   if ((!is.double(gamma))|(length(gamma)>1)){
     stop(cat("Error: correlation parameter must be a real number\n"))
   }
@@ -50,6 +51,21 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
     if (nrow(A)!=ncol(A)){
       stop(cat("Error: number of rows in A not equal to number of columns in A.\n"))
     }
+  }
+  if (!is.null(y)){
+    if (!is.factor(y)){
+      stop(cat("Error: if supplied, y should be a factor"))
+    }
+    if (length(y)!=dim(A)[1]){
+      stop(cat("Error: y and A dimensions disagree"))
+    }
+  }
+  if (!is.matrix(beta)){
+    stop(cat("Error: beta must be input as a matrix"))
+  }
+  
+  if (ncol(X)!=nrow(beta)){
+    stop(cat("Error: X and beta dimensions disagree"))
   }
   
   
@@ -95,6 +111,14 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples){
   zCategories=apply(zCategories,1,which.max)
   for (i in 1:n){
     z[i,zCategories[i]]=1
+  }
+  
+  if (!is.null(y)){
+    z=z*0
+    y=as.numeric(y)
+    for (i in 1:n){
+      z[i,y[i]]=1
+    }
   }
   
   #first, do Gibbs sampling for burn-in iterations, starting from initial configuration
