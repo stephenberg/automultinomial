@@ -174,7 +174,7 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
         j_neighbors=neighbors[neighborStart[j]:neighborEnd[j]]
         for (q in 1:length(j_neighbors)){
           if (j_neighbors[q]!=j){
-            neighborCount_j=neighborCount_j+z[j_neighbors[q],]
+            neighborCount_j=neighborCount_j+z[j_neighbors[q],]#
           }
         }
       }
