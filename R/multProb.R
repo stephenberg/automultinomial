@@ -123,6 +123,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
   #no weighting schemes
   A=1.0*(A>0)
+  Matrix::diag(A)=0
 
   if (sum(A>0)==0){
     stop(cat("Error: no non-zero entries in A"))
@@ -154,7 +155,8 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
   cat("Model fitting done, starting variance estimation\n")
   #########
 
-
+  #conditional probabilities
+  conditionalProbabilities=condProbs(betaGamma,yNumeric,X,neighborResponses)
 
   #########parameter inference
   hessian=numDeriv::jacobian(logPseudolikelihoodGradient,betaGamma,method="Richardson",side=NULL,method.args=list(),yNumeric,X,neighborResponses)
@@ -179,6 +181,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
   colnames(variance)<-varianceNames
 
   gammaHat=betaGamma[length(betaGamma)]
+  
 
   cat(paste("Creating",method,"confidence intervals\n",sep=" "))
   if (method=="asymptotic"){
@@ -194,7 +197,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
     ciMatrix[,2]=betaGamma+ciQuantile*sqrt(diag(variance))
     colnames(ciMatrix)=c("lower","upper")
     rownames(ciMatrix)=varianceNames
-    return(list(betaHat=betaHat,gammaHat=gammaHat,zScores=zScores,pValues=pValues,ciMatrix=ciMatrix,variance=variance,pseudolikelihood=result$value))
+    return(list(betaHat=betaHat,gammaHat=gammaHat,zScores=zScores,pValues=pValues,ciMatrix=ciMatrix,variance=variance,pseudolikelihood=result$value,conditionalProbabilities=conditionalProbabilities))
   }
 
   #if bootstrap
@@ -219,7 +222,7 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
   ciQuantile=qnorm(1-(1-ciLevel)/2)
   colnames(ciMatrix)=c("lower","upper")
   rownames(ciMatrix)=varianceNames
-  return(list(betaHat=betaHat,gammaHat=gammaHat,pValues=pValues,ciMatrix=ciMatrix,variance=variance,bootStrapSamples=betaGammaMatrix,pseudolikelihood=result$value))
+  return(list(betaHat=betaHat,gammaHat=gammaHat,pValues=pValues,ciMatrix=ciMatrix,variance=variance,bootStrapSamples=betaGammaMatrix,pseudolikelihood=result$value,conditionalProbabilities=conditionalProbabilities))
 }
 
 
@@ -231,6 +234,28 @@ varianceComputer<-function(hessian,scoreMatrix,A){
   variance=solve(I)
   variance=variance%*%J%*%variance
   return(variance)
+}
+
+condProbs<-function(betaGammaVector,yNumeric,X,neighborResponses){
+  #problem dimensions
+  K=dim(neighborResponses)[2]
+  n=dim(neighborResponses)[1]
+  
+  betaVector=betaGammaVector[1:(length(betaGammaVector)-1)]
+  gamma=betaGammaVector[length(betaGammaVector)]
+  beta=matrix(betaVector,ncol=K-1)
+  
+  condProbs=X%*%beta
+  condProbs=condProbs+gamma*(neighborResponses[,2:K,drop=FALSE]-neighborResponses[,1])
+  condProbs=cbind(rep(0,n),condProbs)
+  #condProbs=condProbs+gamma*neighborResponses[,2:K,drop=FALSE]
+  #condProbs=cbind(gamma*neighborResponses[,1],condProbs)
+  for (i in 1:n){
+    condProbs[i,]=condProbs[i,]-max(condProbs[i,])
+    condProbs[i,]=exp(condProbs[i,])
+    condProbs[i,]=condProbs[i,]/sum(condProbs[i,])
+  }
+  return(condProbs)
 }
 
 logPseudolikelihood<-function(betaGammaVector,yNumeric,X,neighborResponses){

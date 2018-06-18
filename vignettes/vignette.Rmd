@@ -186,7 +186,7 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
 ```{r,echo=FALSE}
-# y2=drawSamples(beta,0,X,A,nSamples = 1)
+y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
 Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
@@ -200,12 +200,12 @@ Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left pl
 
 
 ```{r,echo=FALSE,warning=FALSE}
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk2.png",width = 500,height = 300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk2.png",width = 500,height = 300)
+grid.arrange(im1, im2, ncol = 2)
+dev.off()
 ```
 
 ###Fitting an autologistic model to the data (K=2 categories)
@@ -306,7 +306,7 @@ y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
 ```{r,echo=FALSE}
-#y2=drawSamples(beta,0,X,A,nSamples = 1)
+y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
 Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
@@ -320,12 +320,12 @@ Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On 
 
 
 ```{r,echo=FALSE,warning=FALSE}
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk3.png",width=500,height=300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk3.png",width=500,height=300)
+grid.arrange(im1, im2, ncol = 2)
+dev.off()
 ```
 
 ###Fitting an automultinomial model to the data (K=3 categories)
