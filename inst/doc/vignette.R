@@ -19,6 +19,7 @@ set.seed(33)
 #10 predictors
 p=5
 
+
 #n times n grid
 n=40
 
@@ -36,23 +37,25 @@ X=matrix(rnorm(n^2*p),ncol=p)
 #set the correlation parameter value (0.7 is a moderate amount of spatial correlation)
 gamma=0.7
 
+## ----echo=FALSE----------------------------------------------------------
+load("data/2category.RData")
+y=as.numeric(y)
+y2=as.numeric(y2)
+
 ## ----eval=FALSE----------------------------------------------------------
 #  #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 #  y=drawSamples(beta,gamma,X,A,nSamples = 1)
 
-## ----echo=FALSE----------------------------------------------------------
-# y2=drawSamples(beta,0,X,A,nSamples = 1)
+## ----eval=FALSE----------------------------------------------------------
+#  y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 ## ----echo=FALSE,warning=FALSE--------------------------------------------
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk2.png",width = 500,height = 300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
-
-## ----echo=FALSE----------------------------------------------------------
-load("data/2category.RData")
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk2.png",width = 500,height = 300)
+grid.arrange(im1, im2, ncol = 2)
+t=dev.off()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  # responses must be input as a factor
@@ -83,7 +86,7 @@ p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],colo
 p1=p1+geom_point(show.legend=TRUE)
 p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
 p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
-p1=p1+scale_y_continuous(limits=c(-0.8,0.9),name = "Coefficient Estimates")
+p1=p1+scale_y_continuous(limits=c(-1.0,1.0),name = "Coefficient Estimates")
 p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
 p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
 p1
@@ -112,23 +115,25 @@ X=matrix(rnorm(n^2*p),ncol=p)
 #set the correlation parameter value (0.7 is a moderate amount of spatial correlation)
 gamma=0.7
 
+## ----echo=FALSE----------------------------------------------------------
+load("data/3category.RData")
+y=as.numeric(y)
+y2=as.numeric(y2)
+
 ## ----eval=FALSE----------------------------------------------------------
 #  #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 #  y=drawSamples(beta,gamma,X,A,nSamples = 1)
 
-## ----echo=FALSE----------------------------------------------------------
-#y2=drawSamples(beta,0,X,A,nSamples = 1)
+## ----eval=FALSE----------------------------------------------------------
+#  y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 ## ----echo=FALSE,warning=FALSE--------------------------------------------
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk3.png",width=500,height=300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
-
-## ----echo=FALSE----------------------------------------------------------
-load("data/3category.RData")
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk3.png",width=500,height=300)
+grid.arrange(im1, im2, ncol = 2)
+t=dev.off()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  #responses must be input as a factor

@@ -160,6 +160,7 @@ set.seed(33)
 #10 predictors
 p=5
 
+
 #n times n grid
 n=40
 
@@ -178,6 +179,12 @@ X=matrix(rnorm(n^2*p),ncol=p)
 gamma=0.7
 ```
 
+```{r,echo=FALSE}
+load("data/2category.RData")
+y=as.numeric(y)
+y2=as.numeric(y2)
+```
+
 
 Then, we will use the drawSamples() function to generate simulated data.
 ```{r,eval=FALSE}
@@ -185,8 +192,8 @@ Then, we will use the drawSamples() function to generate simulated data.
 y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
-```{r,echo=FALSE}
-# y2=drawSamples(beta,0,X,A,nSamples = 1)
+```{r,eval=FALSE}
+y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
 Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
@@ -200,12 +207,12 @@ Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left pl
 
 
 ```{r,echo=FALSE,warning=FALSE}
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk2.png",width = 500,height = 300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk2.png",width = 500,height = 300)
+grid.arrange(im1, im2, ncol = 2)
+t=dev.off()
 ```
 
 ###Fitting an autologistic model to the data (K=2 categories)
@@ -226,9 +233,7 @@ There are also several secondary arguments.
 After fitting the model, we will examine confidence intervals for the fitted parameters.  The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals.
 
 First, we will fit the model using the MPLE() function.
-```{r,echo=FALSE}
-load("data/2category.RData")
-```
+
 ```{r,eval=FALSE}
 # responses must be input as a factor
 y=factor(y)
@@ -261,7 +266,7 @@ p1=ggplot()+geom_errorbar(data=df,aes(x=coefficient,ymin=df[,1],ymax=df[,2],colo
 p1=p1+geom_point(show.legend=TRUE)
 p1=p1+geom_point(data=df,aes(x=coefficient,y=MPLE,shape="MPLE"))
 p1=p1+geom_point(data=df,aes(x=coefficient,y=Truth,shape="Truth"))
-p1=p1+scale_y_continuous(limits=c(-0.8,0.9),name = "Coefficient Estimates")
+p1=p1+scale_y_continuous(limits=c(-1.0,1.0),name = "Coefficient Estimates")
 p1=p1+scale_colour_manual(name="95% CI",values=cbPalette)
 p1=p1+scale_shape_manual(name="Type",values=cbPalette2)
 p1
@@ -300,13 +305,19 @@ X=matrix(rnorm(n^2*p),ncol=p)
 gamma=0.7
 ```
 
+```{r,echo=FALSE}
+load("data/3category.RData")
+y=as.numeric(y)
+y2=as.numeric(y2)
+```
+
 ```{r,eval=FALSE}
 #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 y=drawSamples(beta,gamma,X,A,nSamples = 1)
 ```
 
-```{r,echo=FALSE}
-#y2=drawSamples(beta,0,X,A,nSamples = 1)
+```{r,eval=FALSE}
+y2=drawSamples(beta,0,X,A,nSamples = 1)
 ```
 
 Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
@@ -320,19 +331,16 @@ Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On 
 
 
 ```{r,echo=FALSE,warning=FALSE}
-# im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-# im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-# library(gridExtra)
-# png(filename = "plots/plotk3.png",width=500,height=300)
-# grid.arrange(im1, im2, ncol = 2)
-# dev.off()
+im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
+im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
+library(gridExtra)
+png(filename = "plots/plotk3.png",width=500,height=300)
+grid.arrange(im1, im2, ncol = 2)
+t=dev.off()
 ```
 
 ###Fitting an automultinomial model to the data (K=3 categories)
 
-```{r,echo=FALSE}
-load("data/3category.RData")
-```
 ```{r,eval=FALSE}
 #responses must be input as a factor
 y=factor(y)
