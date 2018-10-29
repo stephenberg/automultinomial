@@ -15,27 +15,27 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This vignette explains the installation and use of the R package automultinomial. The automultinomial package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the autologistic/automultinomial model includes an autocorrelation parameter to account for spatial dependence between observations.
+This vignette explains the installation and use of the R package \texttt{automultinomial}. The \texttt{automultinomial} package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the autologistic/automultinomial model includes an autocorrelation parameter to account for spatial dependence between observations.
 
 The organization of this document is:
 
-1. Description of the problem automultinomial solves
+1. Description of the problem \texttt{automultinomial} solves
 2. cran and Github installation how-to
 3. A data example with binary response (2 response categories)
 4. A data example with 3 response categories
 5. Some comments on autologistic model parameterization
 
-\section{The problem automultinomial solves}
+\section{The problem \texttt{automultinomial} solves}
 
 Consider a data problem where covariates (the independent variables) and categorical outcomes (the dependent variables) are observed on a spatial grid or lattice. If the outcomes are spatially autocorrelated, then our coefficient estimates and inference procedures ought to take this into account. Intuitively, when outcomes are correlated, the effective sample size of the dataset is smaller than if the outcomes were independent. The statistical information we can gain based on samples from multiple nearby sites may be less than if we were able to sample sites that are ``more independent''. 
 
-A particular practical risk in neglecting spatial correlation is that confidence intervals may be too narrow. We might find ``statistically significant'' relationships that are in fact byproducts of noise or dependent sampling. The automultinomial package provides a tool for dealing with outcomes with spatial autocorrelation. It still might happen that nearby sites in a dataset are effectively independent. But we can only assess this using a method that accounts for the spatial arrangement of the samples. 
+A particular practical risk in neglecting spatial correlation is that confidence intervals may be too narrow. We might find ``statistically significant'' relationships that are in fact byproducts of noise or dependent sampling. The \texttt{automultinomial} package provides a tool for dealing with outcomes with spatial autocorrelation. It still might happen that nearby sites in a dataset are effectively independent. But we can only assess this using a method that accounts for the spatial arrangement of the samples. 
 
-Having given a qualitative description of the data problem, we will now move on to a discussion of the probability model used by automultinomial.
+Having given a qualitative description of the data problem, we will now move on to a discussion of the probability model used by \texttt{automultinomial}.
 
 ###Mathematical description
 
-To describe the setup in automultinomial, we will use the notations
+To describe the setup in \texttt{automultinomial}, we will use the notations
 
 * $i=1,...,n$ to index the $n$ observation sites on the spatial grid
 * $K\geq 2$ to denote the number of possible values taken by the response
@@ -50,7 +50,7 @@ To describe the setup in automultinomial, we will use the notations
 
 We will assume that for each site $i$, a collection $N_i$ of neighboring sites is known. If the data are collected in a square lattice fashion, then a natural neighborhood setup is to set $N_i$ to be the 4 Up, Down, Left, and Right neighbors of site $i$ (sites at the boundary of a lattice may have less than 4 neighbors). We will assume $i\notin N_{i}$ for each $i$, so that site $i$ is not a neighbor of itself. It is allowable for sites to have no neighbors. In this case $N_i=\phi$, where $\phi$ denotes the empty set. We will use the notation $i'\sim i$ to indicate that site $i'$ is a neighbor of site $i$.
 
-In the automultinomial package, we will require that the neighborhoods are *symmetric*: if $i'\in N_i$, then necessarily $i\in N_{i'}$ as well. 
+In the \texttt{automultinomial} package, we will require that the neighborhoods are *symmetric*: if $i'\in N_i$, then necessarily $i\in N_{i'}$ as well. 
 
 We will also define an *energy* function $H(\mathbf{z}|\boldsymbol{\beta},\gamma)$. When $K=2$ and the two categories are $k=1$ and $k=2$, then
 $\boldsymbol{\beta}$ is just a vector $\beta$ with length $p$, and \begin{eqnarray}
@@ -63,7 +63,7 @@ In general, for $K\geq 2$ we define $H(\mathbf{z}|\boldsymbol{\beta},\gamma)$ by
 H(\mathbf{z}|\boldsymbol{\beta},\gamma)=\sum_{i=1}^{n}\sum_{k=1}^{K-1}x_i^T\beta_kI(z_i=k+1)+\gamma \sum_{i=1}^{n}\sum_{\substack{i'\sim i\\i'>i}}\sum_{k=1}^{K}I(z_i=z_{i'}=k)
 \end{eqnarray}
 
-With this preamble accomplished, we can define the probability model automultinomial seeks to estimate:
+With this preamble accomplished, we can define the probability model \texttt{automultinomial} seeks to estimate:
 
 \begin{eqnarray}
 p(\mathbf{z}|\boldsymbol{\beta},\gamma)=\frac{\exp\{H(\mathbf{z}|\boldsymbol{\beta},\gamma)\}}{\sum_{\mathbf{z'}}\exp\{H(\mathbf{z'}|\boldsymbol{\beta},\gamma)\}}\label{density}
@@ -75,7 +75,7 @@ Some intuition regarding \eqref{density} can be gained as follows: when $\gamma=
 
 ###Estimating $\boldsymbol{\beta}$ and $\gamma$
 
-The automultinomial package follows the pseudolikelihood approach of (Besag, 1974) to estimate the parameters $\beta,\gamma$. We briefly explain the procedure and its motivation below.
+The \texttt{automultinomial} package follows the pseudolikelihood approach of (Besag, 1974) to estimate the parameters $\beta,\gamma$. We briefly explain the procedure and its motivation below.
 
 When $\gamma$ is known to be $0$, then the responses $z_i$ are independent, and we can use common maximum likelihood techniques such as logistic or multinomial regression to estimate $\beta$. On the other hand, when spatial correlation is present, then we need to estimate $\boldsymbol{\beta}$ and $\gamma$ jointly. Unfortunately, maximum likelihood for the model in equation \eqref{density} is computationally infeasible due to the well known computational intractability of the denominator of $\eqref{density}$ when $\gamma\neq 0$.
 
@@ -103,7 +103,7 @@ and for $1\leq k<K$,
 p(z_i=k+1|z_{-i},\boldsymbol{\beta},\gamma)&=&\frac{\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}\}}{\exp\{\gamma\sum_{i'\sim i}I(z_{i'}=1)\}+\sum_{k=1}^{K-1}\exp\{x_i^T\beta_k+\gamma\sum_{i'\sim i}I(z_{i'}=k+1)\}}\label{p4}
 \end{eqnarray}
 
-In the automultinomial package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} are plugged into equation \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\boldsymbol{\beta}$ and $\gamma$ using the function optim.
+In the \texttt{automultinomial} package, equations \eqref{p1}, \eqref{p2}, \eqref{p3}, and \eqref{p4} are plugged into equation \eqref{pseudolikelihood}, and \eqref{pseudolikelihood} is optimized over $\boldsymbol{\beta}$ and $\gamma$ using the \texttt{optim()} function.
 
 \section{Installation}
 
@@ -122,7 +122,7 @@ and the package will be ready to run.
 
 The most recent (development) version of the package can be installed from Github.
 
-Installing from Github is as easy as installing from cran. First, make sure Hadley Wickham's package devtools is installed on your RStudio:
+Installing from Github is as easy as installing from cran. First, make sure Hadley Wickham's package \texttt{devtools} is installed on your RStudio:
 
 ```{r,eval=FALSE}
 install.packages("devtools")
@@ -139,18 +139,18 @@ Now the package is ready to run.
 
 \section{Data example 1: K=2 response categories}
 
-Here, we will demonstrate how to simulate data using automultinomial, how to fit data using automultinomial, and how to analyze the output.
+Here, we will demonstrate how to simulate data using \texttt{automultinomial}, how to fit data using \texttt{automultinomial}, and how to analyze the output.
 
 ###Simulating data
 
-First we will use the drawSamples() function to simulate some data from the autologistic model. The drawSamples() function takes the following arguments:
+First we will use the \texttt{drawSamples()} function to simulate some data from the autologistic model. The \texttt{drawSamples()} function takes the following arguments:
 
-* beta: the $p\times 1$ coefficient vector (for $K=2$ response categories) or the $p\times (K-1)$ coefficient matrix (for $K>2$ response categories)
-* gamma: the value of the correlation parameter
-* X: the $n\times p$ design matrix $X=[x_1,x_2,...,x_n]^T$
-* A: a square symmetric adjacency matrix encoding the neighborhood structure
-* burnIn: the number of burnIn iterations for the Gibbs sampler. Safe to leave at the default of 300.
-* nSamples: the number of simulated samples to draw.
+* \texttt{beta}: the $p\times 1$ coefficient vector (for $K=2$ response categories) or the $p\times (K-1)$ coefficient matrix (for $K>2$ response categories)
+* \texttt{gamma}: the value of the correlation parameter
+* \texttt{X}: the $n\times p$ design matrix $X=[x_1,x_2,...,x_n]^T$
+* \texttt{A}: a square symmetric adjacency matrix encoding the neighborhood structure
+* \texttt{burnIn}: the number of burnin iterations for the Gibbs sampler. Safe to leave at the default of 300.
+* \texttt{nSamples}: the number of simulated samples to draw.
 
 First, we will set up the simulation parameters:
 ```{r}
@@ -186,7 +186,7 @@ y2=as.numeric(y2)
 ```
 
 
-Then, we will use the drawSamples() function to generate simulated data.
+Then, we will use the \texttt{drawSamples()} function to generate simulated data.
 ```{r,eval=FALSE}
 #use drawSamples to simulate data with parameters beta and gamma by Gibbs sampling
 y=drawSamples(beta,gamma,X,A,nSamples = 1)
@@ -217,22 +217,22 @@ t=dev.off()
 
 ###Fitting an autologistic model to the data (K=2 categories)
 
-Now we'll fit an autologistic model using the MPLE function. The MPLE function takes 3 primary arguments: 
+Now we'll fit an autologistic model using the \texttt{MPLE()} function. The \texttt{MPLE()} function takes 3 primary arguments: 
 
-* X: the design matrix $X=[x_1,x_2,...,x_n]^T$
-* A: a square symmetric adjacency matrix encoding the neighborhood structure
-* y: the response vector $y$, which is required by MPLE to be a factor vector.
+* \texttt{X}: the design matrix $X=[x_1,x_2,...,x_n]^T$
+* \texttt{A}: a square symmetric adjacency matrix encoding the neighborhood structure
+* \texttt{y}: the response vector $y$, which is required by \texttt{MPLE()} to be a factor vector.
 
 There are also several secondary arguments.
 
-* ciLevel: for $xy$% confidence intervals, set ciLevel to $0.xy$ (the default is ciLevel=0.95, which produces 95% confidence intervals)
-* method: By choosing method="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator. For bootstrap confidence intervals, use method="boot". The default is method="asymptotic".
-* burnIn: the number of burnIn iterations for the Gibbs sampler for method="boot". Safe to leave at the default of 300.
-* nBoot: the number of bootstrap samples to use for making bootstrap confidence intervals.
+* \texttt{ciLevel}: for $xy$% confidence intervals, set \texttt{ciLevel} to $0.xy$ (the default is \texttt{ciLevel}=0.95, which produces 95% confidence intervals)
+* \texttt{method}: By choosing \texttt{method}="asymptotic", MPLE will output confidence intervals based on the asymptotic distribution of the pseudolikelihood estimator. For bootstrap confidence intervals, use \texttt{method}="boot". The default is \texttt{method}="asymptotic".
+* \texttt{burnIn}: the number of burnin iterations for the Gibbs sampler for \texttt{method}="boot". Safe to leave at the default of 300.
+* \texttt{nBoot}: the number of bootstrap samples to use for making bootstrap confidence intervals.
 
 After fitting the model, we will examine confidence intervals for the fitted parameters.  The asymptotic type confidence intervals can be computed very quickly, but may be less accurate in practice than bootstrap confidence intervals.
 
-First, we will fit the model using the MPLE() function.
+First, we will fit the model using the \texttt{MPLE()} function.
 
 ```{r,eval=FALSE}
 # responses must be input as a factor
@@ -241,7 +241,8 @@ fit1=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "asymptotic")
 fit2=MPLE(X=X,y=y,A=A,ciLevel = 0.95,method = "boot",nBoot = 500)
 ```
 
-Then, we can use the MPLE_summary() function to view the model summary in table form.
+Then, we can use the \texttt{MPLE\_summary()} function to view the model summary in table form.
+
 ```{r}
 #to see the information contained in fit1 and fit2, use str() (not run to save space)
 #str(fit1)
@@ -279,7 +280,7 @@ Now, we demonstrate the use of the package when there are 3 response categories.
 
 ###Simulating data
 
-Generating simulated data using the function drawSamples().
+Generating simulated data using the function \texttt{drawSamples()}.
 
 ```{r}
 set.seed(42)
@@ -383,7 +384,7 @@ p1
 
 \section{A comparison of different autologistic parameterizations}
 
-Finally, we'll conclude with a discussion of different parameterizations of the autologistic model. We will focus on the case $K=2$ here. The goal for now is to show by example that the parameterization used by automultinomial will be invariant to the choice of reference category (not guaranteed by all of the parameterizations) and to give some concrete data examples.
+Finally, we'll conclude with a discussion of different parameterizations of the autologistic model. We will focus on the case $K=2$ here. The goal for now is to show by example that the parameterization used by \texttt{automultinomial} will be invariant to the choice of reference category (not guaranteed by all of the parameterizations) and to give some concrete data examples.
 
 ###Commonly used autologistic parameterizations
 
@@ -416,10 +417,11 @@ H_{asy}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+
 
 By the Hammersley-Clifford theorem, the density in equation \eqref{asym} is the unique joint distribution corresponding to the conditional distributions in equation \eqref{p12}.
 
-\textbf{Parameterization 2 (Symmetric)}: This parameterization is sometimes referred to as the $\pm 1$ parameterization. We will now show that for $K=2$, the symmetric parameterization is equivalent to the parameterization used by automultinomial. On the other hand, the formulation given for the automultinomial parameterization in section 1 is much more cleanly generalized to $K>2$ categories.
+\textbf{Parameterization 2 (Symmetric)}: This parameterization is sometimes referred to as the $\pm 1$ parameterization. We will now show that for $K=2$, the symmetric parameterization is equivalent to the parameterization used by \texttt{automultinomial}. On the other hand, the formulation given for the \texttt{automultinomial} parameterization in section 1 is much more cleanly generalized to $K>2$ categories.
 
 In the symmetric parameterization, the set of allowed outcomes is taken to be $\{-1,1\}$, and the conditional probabilities at each site are \begin{eqnarray}
-p(z_i=1|z_{-i})=\frac{\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}{1+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}
+p(z_i=1|z_{-i})=\frac{\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}{\exp\{-\gamma\sum_{i'\sim i}z_{i'}\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}\\
+p(z_i=-1|z_{-i})=\frac{\exp\{-\gamma\sum_{i'\sim i}z_{i'}\}}{\exp\{-\gamma\sum_{i'\sim i}z_{i'}\}+\exp\{x_i^T\beta+\gamma\sum_{i'\sim i}z_{i'}\}}
 \end{eqnarray}
 
 Now, as with the asymmetric model, we will map the response set $\{-1,1\}$ to $\{1,2\}$. We will identify $-1$ with $1$ and $1$ with $2$, so that the conditional probabilities become
@@ -443,15 +445,15 @@ H_{sym}(\mathbf{z}|\boldsymbol{\beta},\gamma)=\sum_{i=1}^{n}x_i^T\beta I(z_i=2)+
 By the Hammersley-Clifford theorem, the density in equation \eqref{sym} is the unique joint distribution corresponding to the conditional distributions in equation \eqref{p22}.
 
 
-\textbf{Parameterization 3: the parameterization used in automultinomial}: This parameterization is the parameterization defined in section 2 of this document.
+\textbf{Parameterization 3: the parameterization used in \texttt{automultinomial}}s: This parameterization is the parameterization defined in section 2 of this document.
 
 \subsection{Comparison}
-Having defined the 3 parameterizations, we will now compare them. Our first conclusion is that when $K=2$, the symmetric ($\pm 1$ ) parameterization is *exactly* equivalent to the parameterization used by automultinomial. This conclusion follows from determining that the energies in equations \eqref{H} and \eqref{hsym} are exactly the same, so that the densities in equation \eqref{sym} and \eqref{density} are exactly the same.
+Having defined the 3 parameterizations, we will now compare them. Our first conclusion is that when $K=2$, the symmetric ($\pm 1$ ) parameterization is *exactly* equivalent to the parameterization used by \texttt{automultinomial}. This conclusion follows from determining that the energies in equations \eqref{H} and \eqref{hsym} are exactly the same, so that the densities in equation \eqref{sym} and \eqref{density} are exactly the same.
 
-Therefore, from now on we need only compare the automultinomial parameterization and the asymmetric parameterization. The following statements can be shown:
+Therefore, from now on we need only compare the \texttt{automultinomial} parameterization and the asymmetric parameterization. The following statements can be shown:
 
-* When each site has the same number of neighbors, and the covariate matrix $X=[x_1,x_2,...,x_n]^T$ includes an intercept column, then the asymmetric and the parameterization used in automultinomial are equivalent, in the sense that any joint distribution in the automultinomial parameterization has an equivalent representation in the asymmetric parameterization. The pseudolikelihoods obtained by fitting the automultinomial and the asymmetric parameterizations to a dataset will be identical. The coefficients from the automultinomial parameterization can be obtained from the asymmetric parameterization, and vice versa.
-* When the number of neighbors at each site is different, and/or the covariate matrix does not include an intercept column, then the asymmetric and the automultinomial parameterizations will in general *not* be equivalent. The automultinomial parameterization is invariant to the choice of reference category, whereas the asymmetric parameterization will in general not be invariant to the choice of reference category.
+* When each site has the same number of neighbors, and the covariate matrix $X=[x_1,x_2,...,x_n]^T$ includes an intercept column, then the asymmetric and the parameterization used in \texttt{automultinomial} are equivalent, in the sense that any joint distribution in the \texttt{automultinomial} parameterization has an equivalent representation in the asymmetric parameterization. The pseudolikelihoods obtained by fitting both parameterizations to a dataset will be identical. The coefficients from each parameterization can be obtained from the other.
+* When the number of neighbors at each site is different, and/or the covariate matrix does not include an intercept column, then the asymmetric and the \texttt{automultinomial} parameterizations will in general *not* be equivalent. The \texttt{automultinomial} parameterization is invariant to the choice of reference category, whereas the asymmetric parameterization will in general not be invariant to the choice of reference category.
 
 We will now give some examples on simulated data. 
 
@@ -513,7 +515,7 @@ interceptAutomultinomial-4*gammaAutomultinomial
 
 \textbf{Case 2: different number of neighbors, covariate matrix includes intercept}
 
-Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the automultinomial parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
+Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the \texttt{automultinomial} parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
 
 ```{r}
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1))),family=binomial())
@@ -553,7 +555,7 @@ gammaAutomultinomial2
 
 \textbf{Case 3: same number of neighbors, covariate matrix does not include intercept}
 
-Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the automultinomial parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
+Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the \texttt{automultinomial} parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
 
 ```{r}
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1)))-1,family=binomial())
