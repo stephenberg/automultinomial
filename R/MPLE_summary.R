@@ -7,36 +7,19 @@
 #'@import stats
 #'@examples
 #'
-#' ##########generating coefficient values and data
+#' ##########generating model fit to summarize
 #' #adjacency matrix A
 #' A=igraph::get.adjacency(igraph::make_lattice(c(40,40)))
-#' 
-#' #design matrix
 #' X=cbind(rep(1,1600),matrix(rnorm(1600*4),ncol=4))
-#' 
-#' #correlation parameter
 #' gamma=0.6
-#' 
-#' #2 response categories
-#' beta2=rnorm(5)*0.3
-#' 
-#' #This example uses a short burnIn period. Use a longer burnIn in practice.
-#' y2=drawSamples(beta2,gamma,X,A,burnIn=100,nSamples=1)
-#' 
-#' #3 response categories (not run)
-#' #beta3=rnorm(5)*0.3
-#' #y3=drawSamples(beta3,gamma,X,A,nSamples=1)
+#' beta=matrix(rnorm(5)*0.3,ncol=1)
+#' y=drawSamples(beta,gamma,X,A,burnIn=10,nSamples=1)
+#' fit=MPLE(X = X,y=factor(y),A = A,ciLevel = 0.99,method = "asymptotic")
 #' ##########
 #' 
-#' ##########fitting models
-#' fit2=MPLE(X = X,y=factor(y2),A = A,ciLevel = 0.99,method = "asymptotic")
-#' #fit3=MPLE(X = X,y=factor(y3),A = A,ciLevel = 0.99,method = "asymptotic")
-#' ##########
+#' ##########summarizing model fit
+#' MPLE_summary(fit)
 #' 
-#' ##########summary tables
-#' t2=MPLE_summary(fit2)
-#' #t3=MPLE_summary(fit3)
-#' ##########
 #'@export
 MPLE_summary<-function(fit){
 

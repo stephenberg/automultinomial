@@ -4,7 +4,7 @@
 \alias{drawSamples}
 \title{Simulate data from auto- models}
 \usage{
-drawSamples(beta, gamma, X, A, burnIn = 300, nSamples)
+drawSamples(beta, gamma, X, A, burnIn = 300, nSamples, y = NULL)
 }
 \arguments{
 \item{beta}{coefficient vector (for the autologistic model) or matrix (for the automultinomial model)}
@@ -18,6 +18,8 @@ drawSamples(beta, gamma, X, A, burnIn = 300, nSamples)
 \item{burnIn}{the number of burnin samples to be used. Defaults to 300}
 
 \item{nSamples}{the number of samples to draw}
+
+\item{y}{optional starting configuration, in factor form. Defaults to NULL}
 }
 \value{
 simulated samples
@@ -37,13 +39,13 @@ X=cbind(rep(1,1600),matrix(rnorm(1600*4),ncol=4))
 #correlation parameter
 gamma=0.6
 
-#2 response categories
-beta2=rnorm(5)*0.3
+#2 response categories (1 column in coefficient matrix)
+beta2=matrix(rnorm(5)*0.3,ncol=1)
 #This example uses a short burnIn period. Use a longer burnIn in practice.
-y2=drawSamples(beta2,gamma,X,A,burnIn=100,nSamples=1)
+y2=drawSamples(beta2,gamma,X,A,burnIn=1,nSamples=1)
 
-#3 response categories (not run)
-#beta3=rnorm(5)*0.3
-#y3=drawSamples(beta3,gamma,X,A,nSamples=1)
+#3 response categories (2 columns in coefficient matrix)
+beta3=matrix(rnorm(10)*0.3,ncol=2)
+y3=drawSamples(beta3,gamma,X,A,burnIn=1,nSamples=1)
 ##########
 }

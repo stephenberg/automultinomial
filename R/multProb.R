@@ -28,14 +28,14 @@
 #' gamma=0.6
 #' 
 #' #2 response categories
-#' beta2=rnorm(5)*0.3
+#' beta2=matrix(rnorm(5)*0.3,ncol=1)
 #' 
 #' #This example uses a short burnIn period. Use a longer burnIn in practice.
-#' y2=drawSamples(beta2,gamma,X,A,burnIn=100,nSamples=1)
+#' y2=drawSamples(beta2,gamma,X,A,burnIn=10,nSamples=1)
 #' 
-#' #3 response categories (not run)
-#' #beta3=rnorm(5)*0.3
-#' #y3=drawSamples(beta3,gamma,X,A,nSamples=1)
+#' #3 response categories
+#' beta3=matrix(rnorm(10)*0.3,ncol=2)
+#' y3=drawSamples(beta3,gamma,X,A,burnIn=10,nSamples=1)
 #' ##########
 #' 
 #' ##########fitting models
