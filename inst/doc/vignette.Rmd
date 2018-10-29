@@ -455,7 +455,7 @@ Therefore, from now on we need only compare the automultinomial parameterization
 
 We will now give some examples on simulated data. 
 
-```{r}
+```{r,comment=NA}
 #making a square lattice graph and adjacency matrix with toroidal boundary conditions
 #every site has 4 neighbors
 t1=igraph::make_lattice(c(40,40),circular=TRUE)
@@ -476,7 +476,7 @@ beta=rnorm(3)
 gamma=0.5
 ```
 
-```{r,eval=FALSE}
+```{r,eval=FALSE,comment=NA}
 #simulated responses
 y=drawSamples(beta=beta,gamma=gamma,X = X_intercept, A=a1,nSamples = 1)
 ```
@@ -487,7 +487,7 @@ Here, we see that the pseudolikelihoods match and that coefficients (excepting $
 ```{r,echo=FALSE}
 load("data/paramExample.RData")
 ```
-```{r}
+```{r,comment=NA}
 fitAsymmetric=glm(factor(y)~cbind(X,as.matrix(a1%*%(y-1))),family=binomial())
 fitAutomultinomial=MPLE(X=X_intercept,y=factor(y),A = a1,method="asymptotic")
 
@@ -515,7 +515,7 @@ interceptAutomultinomial-4*gammaAutomultinomial
 
 Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the automultinomial parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
 
-```{r}
+```{r,comment=NA}
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1))),family=binomial())
 fitAutomultinomial1=MPLE(X=X_intercept,y=factor(y),A = a2,method="asymptotic")
 
@@ -555,7 +555,7 @@ gammaAutomultinomial2
 
 Here, we see that the pseudolikelihoods and coefficients no longer match between parameterizations. Additionally, while the automultinomial parameterization is invariant to changes in the reference category, the asymmetric parameterization is not.
 
-```{r}
+```{r,comment=NA}
 fitAsymmetric1=glm(factor(y)~cbind(X,as.matrix(a2%*%(y-1)))-1,family=binomial())
 fitAutomultinomial1=MPLE(X=X,y=factor(y),A = a2,method="asymptotic")
 

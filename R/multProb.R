@@ -123,11 +123,6 @@ MPLE<-function(X,y,A,ciLevel=0.95,method="asymptotic",burnIn=300,nBoot=500){
 
   #no weighting schemes
   A=1.0*(A>0)
-  Matrix::diag(A)=0
-
-  if (sum(A>0)==0){
-    stop(cat("Error: no non-zero entries in A"))
-  }
 
   #create beta matrix
   beta=matrix(0,p,K-1)
@@ -371,7 +366,9 @@ bootStrap<-function(betaGammaVector,yNumeric,X,neighborResponses,burnIn=300,nBoo
 
   #first, do Gibbs sampling for burn-in iterations, starting from initial configuration
   #yNumeric
+  A=A+Matrix::diag(1,dim(A)[1],dim(A)[2])
   indices=Matrix::summary(Matrix::Matrix(A>0,sparse=TRUE))
+  A=A-Matrix::diag(1,dim(A)[1],dim(A)[2])
 
   nNeighbors=rep(0,n)
   for (i in 1:n){

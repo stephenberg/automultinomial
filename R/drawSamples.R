@@ -78,7 +78,7 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
   if (max(abs(Matrix::diag(A)))>10^{-9}){
     stop(cat("Error: diagonal entries of A should be 0.\n"))
   }
-
+  
   #symmetry check
   if (!Matrix::isSymmetric(A,tol=10^{-9})){
     stop(cat("Error: A should be a symmetric matrix\n"))
@@ -92,14 +92,13 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
   if (nrow(beta)!=ncol(X)){
     stop(cat("Error: dimensions of beta and design matrix X disagree\n"))
   }
-
+  
   #no weighting schemes
   A=1.0*(A>0)
-  if (sum(A>0)==0){
-    stop(cat("Error: no non-zero entries in A"))
-  }
 
-
+  
+  
+  
   p=dim(X)[2]
   n=dim(X)[1]
   beta=as.matrix(beta)
@@ -123,8 +122,10 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
   
   #first, do Gibbs sampling for burn-in iterations, starting from initial configuration
   #yNumeric
+  A=A+Matrix::diag(1,dim(A)[1],dim(A)[2])
   indices=Matrix::summary(Matrix::Matrix(A>0,sparse=TRUE))
-
+  A=A-Matrix::diag(1,dim(A)[1],dim(A)[2])
+  
   nNeighbors=rep(0,n)
   for (i in 1:n){
     if (!(i%in%indices[,2])){
@@ -161,9 +162,9 @@ drawSamples<-function(beta,gamma,X,A,burnIn=300,nSamples,y=NULL){
       cat(paste(i," burn-in samples so far\n"))
     }
   }
-
+  
   sampleMatrix=matrix(0,n,nSamples)
-
+  
   ##############
   #now draw samples
   cat("Drawing samples\n")
