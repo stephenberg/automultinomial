@@ -206,15 +206,6 @@ Figure \ref{fig:plotk2} shows plots of the responses on the grid. On the left pl
 \end{figure}
 
 
-```{r,echo=FALSE,warning=FALSE}
-im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-library(gridExtra)
-png(filename = "plots/plotk2.png",width = 500,height = 300)
-grid.arrange(im1, im2, ncol = 2)
-t=dev.off()
-```
-
 ###Fitting an autologistic model to the data (K=2 categories)
 
 Now we'll fit an autologistic model using the \texttt{MPLE()} function. The \texttt{MPLE()} function takes 3 primary arguments: 
@@ -330,16 +321,6 @@ Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On 
 	\caption{On the left, a plot of the 3-category dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
 	\label{fig:plotk3}
 \end{figure}
-
-
-```{r,echo=FALSE,warning=FALSE}
-im1=Matrix::image(Matrix::Matrix(matrix(y,ncol=n)))
-im2=Matrix::image(Matrix::Matrix(matrix(y2,ncol=n)))
-library(gridExtra)
-png(filename = "plots/plotk3.png",width=500,height=300)
-grid.arrange(im1, im2, ncol = 2)
-t=dev.off()
-```
 
 ###Fitting an automultinomial model to the data (K=3 categories)
 
