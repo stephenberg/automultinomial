@@ -35,28 +35,13 @@ of the models the package fits and a user guide, please see the vignette.
 }
 \examples{
 ##########generating coefficient values and data
-#adjacency matrix A
-A=igraph::get.adjacency(igraph::make_lattice(c(40,40)))
+A=igraph::get.adjacency(igraph::make_lattice(c(40,40))) #adjacency matrix A
+X=cbind(rep(1,1600),matrix(rnorm(1600*4),ncol=4)) #design matrix
+gamma=0.6 #correlation parameter
+beta=matrix(rnorm(5)*0.3,ncol=1) #covariate parameters
+y=drawSamples(beta,gamma,X,A,burnIn=10,nSamples=1)
 
-#design matrix
-X=cbind(rep(1,1600),matrix(rnorm(1600*4),ncol=4))
+##########fitting model
+fit=MPLE(X = X,y=factor(y),A = A,ciLevel = 0.99,method = "asymptotic")
 
-#correlation parameter
-gamma=0.6
-
-#2 response categories
-beta2=matrix(rnorm(5)*0.3,ncol=1)
-
-#This example uses a short burnIn period. Use a longer burnIn in practice.
-y2=drawSamples(beta2,gamma,X,A,burnIn=10,nSamples=1)
-
-#3 response categories
-beta3=matrix(rnorm(10)*0.3,ncol=2)
-y3=drawSamples(beta3,gamma,X,A,burnIn=10,nSamples=1)
-##########
-
-##########fitting models
-fit2=MPLE(X = X,y=factor(y2),A = A,ciLevel = 0.99,method = "asymptotic")
-#fit3=MPLE(X = X,y=factor(y3),A = A,ciLevel = 0.99,method = "asymptotic")
-##########
 }

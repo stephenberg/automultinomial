@@ -1,7 +1,4 @@
-## Resubmission of version 2.0.0
-Changes in this resubmission:
-* added space before ``<http" in description file
-* added examples for all exported functions
+## Version 2.0.0 of automultinomial
 
 This is a new version of a package currently on cran. In this version I have:
 
