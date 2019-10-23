@@ -128,7 +128,7 @@ y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 The figure shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
 
-![](plots/plotk2.png)
+![](vignettes/plots/plotk2.png)
 
 ### Fitting an autologistic model to the data (K=2 categories)
 
@@ -222,7 +222,7 @@ fitSummary2=MPLE_summary(fit2)
 ## 5    -0.686 (0)
 ```
 
-![](vignetteHTML_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+![](vignettes/vignetteHTML_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 # Data example 2: K=3 response categories
 
@@ -284,7 +284,7 @@ y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
 
-![](plots/plotk3.png)
+![](vignettes/plots/plotk3.png)
 
 
 ### Fitting an automultinomial model to the data (K=3 categories)
@@ -361,4 +361,4 @@ fitSummary2=MPLE_summary(fit2)
 ```
 
 
-![](vignetteHTML_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+![](vignettes/vignetteHTML_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
