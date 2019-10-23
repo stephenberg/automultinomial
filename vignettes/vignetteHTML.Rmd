@@ -1,9 +1,10 @@
 ---
-title: "Automultinomial Vignette"
+title: "Automultinomial Intro"
 author: "Stephen Berg"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::github_document
+output:
+  html_document:
+    keep_md: yes
 vignette: >
   %\VignetteIndexEntry{Automultinomial Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -116,13 +117,7 @@ y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 The figure shows plots of the responses on the grid. On the left plot, we can see "clumping" of the responses due to the positive autocorrelation parameter $\gamma=0.7$. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=1\textwidth]{plots/plotk2.png}
-	\caption{On the left, a plot of the dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
-	\label{fig:plotk2}
-\end{figure}
-
+![](plots/plotk2.png)
 
 ### Fitting an autologistic model to the data (K=2 categories)
 
@@ -233,12 +228,8 @@ y2=drawSamples(beta,0,X,A,nSamples = 1)
 
 Figure \ref{fig:plotk3} shows plots of the 3-category responses on the grid. On the left plot, we again see "clumping" of the responses due to the positive autocorrelation parameter. The right hand plot is from the distribution with the same $\boldsymbol{\beta}$, and $\gamma=0$.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=1\textwidth]{plots/plotk3.png}
-	\caption{On the left, a plot of the 3-category dataset we just simulated, where the truth is $\gamma=0.7$. For comparison, the plot on the right shows data taken from the same model but with $\gamma=0$.}
-	\label{fig:plotk3}
-\end{figure}
+![](plots/plotk3.png)
+
 
 ### Fitting an automultinomial model to the data (K=3 categories)
 
