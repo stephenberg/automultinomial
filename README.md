@@ -1,21 +1,6 @@
----
-title: "Automultinomial Intro"
-author: "Stephen Berg"
-date: "2019-10-23"
-output:
-  html_document:
-    keep_md: yes
-vignette: >
-  %\VignetteIndexEntry{Automultinomial Vignette}
-  %\VignetteEngine{knitr::rmarkdown}
-  header-includes:
-   - \usepackage{amsmath}
-   - \usepackage[utf8]{inputenc}
----
+# automultinomial intro
 
-
-
-This intro explains the installation and use of the R package **automultinomial**. The **automultinomial** package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the autologistic/automultinomial model includes an autocorrelation parameter to account for spatial dependence between observations.
+This intro is an abbreviated version of the cran vignette for the R package **automultinomial**. The **automultinomial** package is designed to be used for regressions similar to logistic or multinomial logit regression. However, unlike ordinary logistic and multinomial logit models, the autologistic/automultinomial model includes an autocorrelation parameter to account for spatial dependence between observations.
 
 The organization of this document is:
 
