@@ -1,4 +1,4 @@
-Automultinomial Vignette
+Automultinomial
 ================
 Stephen Berg
 2019-10-23
@@ -240,7 +240,7 @@ fitSummary2=MPLE_summary(fit2)
     ## 4    -0.085 (0.25)              
     ## 5    -0.686 (0)
 
-![](vignetteHTML_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](vignettes/vignetteHTML_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 # Data example 2: K=3 response categories
 
@@ -369,4 +369,4 @@ fitSummary2=MPLE_summary(fit2)
     ## 4    0.181 (0.024)    0.722 (0)                  
     ## 5    0.153 (0.054)    -0.056 (0.434)
 
-![](vignetteHTML_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](vignettes/vignetteHTML_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
